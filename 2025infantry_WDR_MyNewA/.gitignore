@@ -1,0 +1,13 @@
+##keil生成，需要忽略的debugconfig和obj目录
+#*.bak
+#*.scvd
+#*.ini
+#*.Administrator
+#*.hp
+#*.uvoptx
+
+Output/  
+bulid/
+.vscode/
+Listings/
+Objects/
