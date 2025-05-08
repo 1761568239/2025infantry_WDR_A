@@ -41,20 +41,14 @@ float calculate_input_power(float chassis_power, float max_power_limit) {
         input_power = -0.5f * (max_power_limit - chassis_power) + max_power_limit;
     }
     else if (chassis_power <= max_power_limit) {
-        // 底盘功率接近但未超过限制，减小功率
-        input_power = 0.5f * (max_power_limit - chassis_power) + max_power_limit;
+        // 底盘功率接.近但未超过限制，减小功率
+        input_power = -0.5f * (max_power_limit - chassis_power) + max_power_limit;
     }
     else {
         // 底盘功率已超过限制（是超级电容在工作）
         // 设置一个最小值，避免负数
-        input_power = max_power_limit * 0.8f; // 设置为限制功率的30%作为最低保障
+        input_power = 0.1f * (max_power_limit - chassis_power) + max_power_limit; // 设置为限制功率的30%作为最低保障
     }
-    
-//    // 确保功率不小于最低安全值
-//    float min_safe_power = max_power_limit * 0.2f;
-//    if (input_power < min_safe_power) {
-//        input_power = min_safe_power;
-//    }
     
     return input_power;
 }
@@ -88,7 +82,7 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 	input_power = calculate_input_power(chassis_power, max_power_limit);
 
   //快速放电模式，用于飞坡
-	if (rc_ctrl.key.v & KEY_PRESSED_OFFSET_CTRL)
+	if (rc_ctrl.key.v & KEY_PRESSED_OFFSET_F)
 	{
 		cap_state = 1;
 	}

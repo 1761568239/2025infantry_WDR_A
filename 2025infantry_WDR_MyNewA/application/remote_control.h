@@ -43,11 +43,11 @@
 #define KEY_PRESSED_OFFSET_A            ((uint16_t)1 << 2)		//
 #define KEY_PRESSED_OFFSET_D            ((uint16_t)1 << 3)		//
 #define KEY_PRESSED_OFFSET_SHIFT        ((uint16_t)1 << 4)		//
-#define KEY_PRESSED_OFFSET_CTRL         ((uint16_t)1 << 5)		//快速释放能量
+#define KEY_PRESSED_OFFSET_CTRL         ((uint16_t)1 << 5)		//
 #define KEY_PRESSED_OFFSET_Q            ((uint16_t)1 << 6)		//摩擦轮开
 #define KEY_PRESSED_OFFSET_E            ((uint16_t)1 << 7)		//摩擦轮关
 #define KEY_PRESSED_OFFSET_R            ((uint16_t)1 << 8)		//复位 R	+ CRTL
-#define KEY_PRESSED_OFFSET_F            ((uint16_t)1 << 9)		//
+#define KEY_PRESSED_OFFSET_F            ((uint16_t)1 << 9)		//快速释放能量
 #define KEY_PRESSED_OFFSET_G            ((uint16_t)1 << 10)		
 #define KEY_PRESSED_OFFSET_Z            ((uint16_t)1 << 11)		//关闭小陀螺
 #define KEY_PRESSED_OFFSET_X            ((uint16_t)1 << 12)		

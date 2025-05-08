@@ -302,7 +302,7 @@ void UI_task_entry(void const *pvParameters)
 		vTaskDelay(100);
 		
 		//ÏµÍ³¸´Î»
-		if((rc_ctrl.key.v & KEY_PRESSED_OFFSET_R)&&(rc_ctrl.key.v & KEY_PRESSED_OFFSET_CTRL))
+		if((rc_ctrl.key.v & KEY_PRESSED_OFFSET_R)&&(rc_ctrl.key.v & KEY_PRESSED_OFFSET_F))
 		{
 			NVIC_SystemReset();
 		}
