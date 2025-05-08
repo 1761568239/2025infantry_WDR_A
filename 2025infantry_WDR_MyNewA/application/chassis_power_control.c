@@ -22,7 +22,6 @@
 #include "CAN_receive.h"
 #include "CAN_CAPower.h"
 
-
 extern CapDataTypedef CAP_CANData; // capacitor data structure
 extern RC_ctrl_t rc_ctrl;
 uint8_t cap_state = 0;
@@ -31,6 +30,34 @@ float input_power = 50;
 float debug_chassic_buffer = 0.0f;
 uint8_t cap_energy_cal = 0;
 float debug_chassic_limit = 0.0f;
+
+// 修正后的功率管理逻辑
+float calculate_input_power(float chassis_power, float max_power_limit) {
+    float input_power;
+    
+    // 考虑超级电容情况，确保输入功率不会变为负数
+    if (chassis_power < 0.9f * max_power_limit) {
+        // 底盘功率较低，可以适当增加功率
+        input_power = -0.5f * (max_power_limit - chassis_power) + max_power_limit;
+    }
+    else if (chassis_power <= max_power_limit) {
+        // 底盘功率接近但未超过限制，减小功率
+        input_power = 0.5f * (max_power_limit - chassis_power) + max_power_limit;
+    }
+    else {
+        // 底盘功率已超过限制（是超级电容在工作）
+        // 设置一个最小值，避免负数
+        input_power = max_power_limit * 0.8f; // 设置为限制功率的30%作为最低保障
+    }
+    
+//    // 确保功率不小于最低安全值
+//    float min_safe_power = max_power_limit * 0.2f;
+//    if (input_power < min_safe_power) {
+//        input_power = min_safe_power;
+//    }
+    
+    return input_power;
+}
 
 void chassis_power_control(chassis_move_t *chassis_power_control)
 {
@@ -41,7 +68,7 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 	fp32 scaled_give_power[4];
 
 	    // 后轮功率分配系数（大于1表示后轮获得更多功率）
-  const float rear_wheel_power_ratio = 1.5f;
+//  const float rear_wheel_power_ratio = 1.5f;
 	
 	fp32 chassis_power = 0.0f;
 	fp32 chassis_power_buffer = 0.0f;
@@ -58,16 +85,8 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 	debug_chassic_limit = max_power_limit;        
 
 	//计算输入功率
-	input_power = 0.5f*(input_power - chassis_power) + input_power; //修bug  0.5	 
-	if(chassis_power < 0.9f*max_power_limit)
-	{
-		input_power = -0.5f*(max_power_limit - chassis_power) + max_power_limit; //修bug
-	}
-	else 
-	{
-		input_power = 0.5f*(max_power_limit - chassis_power) + max_power_limit; //修bug
-	}
-	
+	input_power = calculate_input_power(chassis_power, max_power_limit);
+
   //快速放电模式，用于飞坡
 	if (rc_ctrl.key.v & KEY_PRESSED_OFFSET_CTRL)
 	{
@@ -76,9 +95,8 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 	else
 	{
 		cap_state = 0;
-
 	}
-	
+
 	//设置不同的需求功率，控制超电选择超电或者放电
 	if(cap_state == 1)
 	{
@@ -104,10 +122,10 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 				chassis_max_power = input_power;
 			}
 		}
-	
+
 	// 设置电容控制器的输入功率
-	//CAP_CAN_DataSend(&CAP_CANData, input_power-5, CAP_ENABLE);
-		
+	CAP_CAN_DataSend(&CAP_CANData, input_power-5, CAP_ENABLE);
+
 	for (uint8_t i = 0; i < 4; i++) // first get all the initial motor power and total motor power
 	{
 		initial_give_power[i] = chassis_power_control->motor_speed_pid[i].out * toque_coefficient * chassis_power_control->motor_chassis[i].chassis_motor_measure->speed_rpm +
@@ -180,4 +198,3 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 		}
 	}
 }
-

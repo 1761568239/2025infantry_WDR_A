@@ -25,7 +25,8 @@ float pre_xc;
 float pre_yc;
 float pre_yaw;
 float smoothing_factor = 0;
-
+float alpha = 0.2f;
+float last_filtered_v_yaw = 2.5f;
 /**
   * @brief   初始化自动但刀片解算相关参数               
   * @param   无
@@ -85,7 +86,7 @@ float calculate_dynamic_smoothing_factor(float v_yaw, uint8_t armor_id)
 		else if (factor > 0.2f && factor <= 1.5f)
 			return factor;
 		else
-			return 1.0f;
+			return 1.5f;
 }
 
 /*
@@ -109,42 +110,34 @@ void autoSolveTrajectory(float *pitch, float *yaw, float *aim_x, float *aim_y, f
     float v_yaw = st.v_yaw;
     float r1 = st.r1;
     float r2 = st.r2;
-		float linear_speed = sqrt(st.vxw*st.vxw + st.vyw*st.vyw);//目标平移速度
-	  smoothing_factor = calculate_dynamic_smoothing_factor(v_yaw, st.armor_id);//预测权重，可以根据实际情况调整 越大越相信预测结果
+//		float linear_speed = sqrt(st.vxw*st.vxw + st.vyw*st.vyw);//目标平移速度
+
         st.current_yaw = gimbal_control.gimbal_yaw_motor.absolute_angle;
         st.current_pitch = gimbal_control.gimbal_pitch_motor.absolute_angle;
-	  // 调试
 	
-//    filtered_v_yaw = filtered_v_yaw * (1-BASE_YAW_FILTER_COEFF) + v_yaw * BASE_YAW_FILTER_COEFF;
-//		if (linear_speed > 0.3f)// 避免静止目标跟随慢
-//		{
-//				filtered_v_yaw += step_size; // 增量更新
-//		}
-//		// 调试
-//		watch_debug_1 = st.v_yaw;
-//		filtered_v_yaw += step_size; // 增量更新
-//		watch_debug_2 = filtered_v_yaw;
-//		smoothing_factor = calculate_dynamic_smoothing_factor(filtered_v_yaw, st.armor_id);//预测权重，可以根据实际情况调整 越大越相信预测结果
-	  watch_debug_3 = smoothing_factor;
     //计算装甲板坐标
     float xa = xc - r1*cosf(armor_yaw);
     float ya = yc - r1*sinf(armor_yaw);
-//    //计算延迟 
-//    float latency = 
+
     //计算飞行时间
     float distance = sqrt(xa*xa + ya*ya);
     float horizontal_speed = st.current_v * cosf(st.current_pitch);
 
-//    fly_time = calculate_fly_time_optimized(xa, ya, st.vxw, st.vyw, horizontal_speed, st.bias_time);
     fly_time = distance / horizontal_speed + st.bias_time/1000.0f;        
 
     //计算飞行时间后的装甲板位置
     pre_xc = xc + st.vxw * fly_time;
     pre_yc = yc + st.vyw * fly_time;
     pre_yaw = armor_yaw + st.v_yaw * fly_time;
-   
+
+		float filtered_v_yaw = alpha * v_yaw + (1.0f - alpha) * last_filtered_v_yaw; // 低通滤波
+		last_filtered_v_yaw	 = 	filtered_v_yaw;
+		watch_debug_1 = v_yaw;
+		watch_debug_2 = filtered_v_yaw;
+		smoothing_factor = calculate_dynamic_smoothing_factor(filtered_v_yaw, st.armor_id);//预测权重，可以根据实际情况调整 越大越相信预测结果
+		
     control_status = 0;
-    if(fabsf(st.v_yaw) < 2.0f && received_packed.tracking == 1)
+    if(fabsf(st.v_yaw) < 1.5f && received_packed.tracking == 1)
     {
         *aim_x = pre_xc - r1 * cosf(pre_yaw);
         *aim_y = pre_yc - r1 * sinf(pre_yaw);

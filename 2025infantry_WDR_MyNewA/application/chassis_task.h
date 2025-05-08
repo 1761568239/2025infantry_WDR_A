@@ -55,7 +55,7 @@
 #define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KI 0.01f     //0
 #define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KD 0.10f  	//0.0
 //底盘旋转跟随PID
-#define CHASSIS_FOLLOW_GIMBAL_PID_KP 16.5f      //7.5     15
+#define CHASSIS_FOLLOW_GIMBAL_PID_KP 16.5f      //16.5
 #define CHASSIS_FOLLOW_GIMBAL_PID_KI 0.05f      //0      0.01
 #define CHASSIS_FOLLOW_GIMBAL_PID_KD 0.10f  	//0.1
 #define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT    12.0f   //10
@@ -75,7 +75,7 @@
 //任务开始空闲一段时间
 #define CHASSIS_TASK_INIT_TIME 357
 //调试时可选择失能底盘，直接发送0电流，1：失能底盘  0：使能底盘 
-#define CHASSIC_DISABLE   1
+#define CHASSIC_DISABLE   0
 //前后的遥控器通道号码
 #define CHASSIS_X_CHANNEL 1
 //左右的遥控器通道号码
@@ -114,10 +114,9 @@
 //m3508转化成底盘速度(m/s)的比例
 #define CHASSIS_MOTOR_RPM_TO_VECTOR_SEN  0.000299f  
 //单个底盘电机最大速度
-#define MAX_WHEEL_SPEED         8.0f//8.0f   
+#define MAX_WHEEL_SPEED       8.0f   
 //底盘运动过程最大前进速度   			
-#define CHASSIS_MAX_SPEED_X 	2.0f  //2.0  
-#define CHASSIS_MAX_SPEED_X_ADD 2.0f
+#define CHASSIS_MAX_SPEED_X 	2.5f  //2.0  
 //底盘运动过程最大平移速度
 #define CHASSIS_MAX_SPEED_Y     2.5f  //2.0  
 //小陀螺转速

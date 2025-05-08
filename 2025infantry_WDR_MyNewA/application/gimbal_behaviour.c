@@ -434,7 +434,7 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
 	}
 
 	//判断遥控器在线否
-    if( toe_is_error(DBUS_TOE))
+    if( toe_is_error(DBUS_TOE) || get_robot_remain_HP() == 0)//阵亡后进入无力状态，防止复活后混乱
     {
         gimbal_behaviour = GIMBAL_ZERO_FORCE;
     }

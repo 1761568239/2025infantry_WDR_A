@@ -220,7 +220,7 @@ void UART1_receive_IDE(void)
 {
 	static uint16_t check_sum = 0;
 	HAL_UART_DMAStop(&huart1);  //停止DMA传输
-//	fifo_s_puts(&auto_shoot_fifo, (char*)RX_buf, DATE_LENGTH);    //现在放在虚拟串口接收里面
+	fifo_s_puts(&auto_shoot_fifo, (char*)RX_buf, DATE_LENGTH);    //现在放在虚拟串口接收里面
 	HAL_UART_Receive_DMA(&huart1,RX_buf, RX_BUF_NUM);  //打开DMA继续接收
 }
 

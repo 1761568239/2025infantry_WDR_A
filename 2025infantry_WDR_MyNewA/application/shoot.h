@@ -70,9 +70,9 @@
 #define SHOOT_ON_KEYBOARD           KEY_PRESSED_OFFSET_Q
 #define SHOOT_OFF_KEYBOARD          KEY_PRESSED_OFFSET_E
 //鼠标长按判断
-#define PRESS_LONG_TIME             800     //500
+#define PRESS_LONG_TIME             500
 //遥控器射击开关打下档一段时间后加快拨弹----需要再写逻辑
-#define RC_S_LONG_TIME              1500    //2000
+#define RC_S_LONG_TIME              800    //2000
 //电机反馈码盘值范围
 #define HALF_ECD_RANGE              4096
 #define ECD_RANGE                   8191
@@ -80,8 +80,8 @@
 #define MOTOR_RPM_TO_SPEED          0.00290888208665721596153948461415f 
 //拨弹速度
 #define TRIGGER_SPEED               -5.0f     //-5
-#define CONTINUE_TRIGGER_SPEED      -5.0f		//10.0
-#define AUTO_TRIGGER_SPEED          -5.0f	  //20.0
+#define CONTINUE_TRIGGER_SPEED      -10.0f		//10.0
+#define AUTO_TRIGGER_SPEED          -20.0f	  //20.0
 //卡单时间 以及反转时间
 #define BLOCK_TRIGGER_SPEED         2.0f
 #define BLOCK_TIME                  1000   //1000
@@ -93,7 +93,6 @@
 //热量限制保留，防止操作手超热量
 #define SHOOT_HEAT_REMAIN_VALUE_MAX     49  //50
 #define SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX 80
-#define SHOOT_HEAT_REMAIN_VALUE_MIN     5
 //3508转换为速度
 #define M3508_MOTOR_RPM_TO_VECTOR 0.000415809748903494517209f 
 /**********************************  其他宏定义常量 *************************************/

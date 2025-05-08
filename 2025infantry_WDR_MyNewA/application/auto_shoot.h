@@ -20,7 +20,7 @@
 #define DATE_LENGTH    sizeof(received_packed_t) //有效数据
 
 //自瞄串口选择 1：使用虚拟串口USB     0：使用串口1
-#define AUTO_UART_SELECT         1
+#define AUTO_UART_SELECT         0
 //初始化CRC校验值
 #define CRC_INIT_AUTO            0xFFFF
 

@@ -216,19 +216,11 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
     //最大 最小速度
-		if(cap_state == 0)
-		{
-			chassis_move_init->vx_max_speed =  CHASSIS_MAX_SPEED_X;
-			chassis_move_init->vy_max_speed =  CHASSIS_MAX_SPEED_Y;	
-		}
-		else if(cap_state == 1)
-		{
-			chassis_move_init->vx_max_speed =  CHASSIS_MAX_SPEED_X + CHASSIS_MAX_SPEED_X_ADD;
-			chassis_move_init->vy_max_speed =  CHASSIS_MAX_SPEED_Y;				
-		}
-			chassis_move_init->vx_min_speed = -CHASSIS_MAX_SPEED_X;		
-			chassis_move_init->vy_min_speed = -CHASSIS_MAX_SPEED_Y;
-	chassis_move_init->gyroscope_flag = 0;	
+		chassis_move_init->vx_max_speed =  CHASSIS_MAX_SPEED_X;
+		chassis_move_init->vy_max_speed =  CHASSIS_MAX_SPEED_Y;	
+		chassis_move_init->vx_min_speed =  -CHASSIS_MAX_SPEED_X;
+		chassis_move_init->vy_min_speed =  -CHASSIS_MAX_SPEED_Y;				
+	    chassis_move_init->gyroscope_flag = 0;	
     //更新一下数据
     chassis_feedback_update(chassis_move_init);
 }
