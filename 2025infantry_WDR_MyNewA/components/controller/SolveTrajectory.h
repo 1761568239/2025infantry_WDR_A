@@ -16,18 +16,9 @@
 #define AM02_WIDE  (0.115/2)
 #define AM12_LENTH (0.205/2)
 #define AM12_WIDE  (0.117/2)
-//安全系数
-#define SAFETY_FACTOR_Y1 0.25
-#define SAFETY_FACTOR_Y2 0.55
-#define SAFETY_FACTOR_Y3 0.7
-#define KY 0.6//0.93805    0.3
-#define BASICY -0.00754
-#define KP 0.8//1.62957   0.7
-#define BASICP -0.01569
-#define SAFETY_FACTOR_P 0.8
 
-#define ARMOR_YAW_LIMIT_OFFSET 0.22f
-#define ARMOR_YAW_LIMIT 0.6f
+#define ARMOR_YAW_LIMIT_OFFSET 0.18f//0.22f
+#define ARMOR_YAW_LIMIT 0.5f//0.6f
 
 
 typedef unsigned char uint8_t;
@@ -98,6 +89,7 @@ struct tar_pos
     float z;           //装甲板在世界坐标系下的z
     float yaw;         //装甲板坐标系相对于世界坐标系的yaw角
 };
+
 extern void st_Data_Iint(void);
 //单方向空气阻力模型
 extern float monoDirectionalAirResistanceModel(float s, float v, float angle);
