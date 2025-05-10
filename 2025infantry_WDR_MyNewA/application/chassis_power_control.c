@@ -22,36 +22,14 @@
 #include "CAN_receive.h"
 #include "CAN_CAPower.h"
 
+
 extern CapDataTypedef CAP_CANData; // capacitor data structure
-extern RC_ctrl_t rc_ctrl;
-uint8_t cap_state = 0;
+
 float input_power = 50;	
 //调试变量
 float debug_chassic_buffer = 0.0f;
 uint8_t cap_energy_cal = 0;
 float debug_chassic_limit = 0.0f;
-
-// 修正后的功率管理逻辑
-float calculate_input_power(float chassis_power, float max_power_limit) {
-    float input_power;
-    
-    // 考虑超级电容情况，确保输入功率不会变为负数
-    if (chassis_power < 0.9f * max_power_limit) {
-        // 底盘功率较低，可以适当增加功率
-        input_power = -0.5f * (max_power_limit - chassis_power) + max_power_limit;
-    }
-    else if (chassis_power <= max_power_limit) {
-        // 底盘功率接.近但未超过限制，减小功率
-        input_power = -0.5f * (max_power_limit - chassis_power) + max_power_limit;
-    }
-    else {
-        // 底盘功率已超过限制（是超级电容在工作）
-        // 设置一个最小值，避免负数
-        input_power = 0.1f * (max_power_limit - chassis_power) + max_power_limit; // 设置为限制功率的30%作为最低保障
-    }
-    
-    return input_power;
-}
 
 void chassis_power_control(chassis_move_t *chassis_power_control)
 {
@@ -61,9 +39,6 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 	float initial_total_power = 0;
 	fp32 scaled_give_power[4];
 
-	    // 后轮功率分配系数（大于1表示后轮获得更多功率）
-//  const float rear_wheel_power_ratio = 1.5f;
-	
 	fp32 chassis_power = 0.0f;
 	fp32 chassis_power_buffer = 0.0f;
 	
@@ -79,46 +54,48 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 	debug_chassic_limit = max_power_limit;        
 
 	//计算输入功率
-	input_power = calculate_input_power(chassis_power, max_power_limit);
-
-  //快速放电模式，用于飞坡
-	if (rc_ctrl.key.v & KEY_PRESSED_OFFSET_F)
+	input_power = 0.5f*(input_power - chassis_power) + input_power; //修bug  0.5	
+	
+	if(chassis_power < 0.9f*max_power_limit)
 	{
-		cap_state = 1;
+		input_power = -0.5f*(max_power_limit - chassis_power) + 0.9*max_power_limit; //修bug
+	}
+	else if(chassis_power <= max_power_limit) 
+	{
+		input_power = -0.5f*(max_power_limit - chassis_power) + 0.9f*max_power_limit; //修bug
 	}
 	else
 	{
-		cap_state = 0;
+		input_power = 0.1f*(max_power_limit - chassis_power) + max_power_limit;
 	}
-
-	//设置不同的需求功率，控制超电选择超电或者放电
-	if(cap_state == 1)
-	{
-		input_power = 0.9f*max_power_limit;      
-		chassis_max_power = 200;
-	}
-	else
-	{
-			if (CAP_CANData.cap_energy > 60)
-			{
-				chassis_max_power = input_power + 50; // 略大于最大功率，避免电容器一直充满，提高能量利用率 50
-			}
-			else if (CAP_CANData.cap_energy <= 60 && CAP_CANData.cap_energy > 40)
-			{
-				chassis_max_power = input_power + 40;    //当电容电量不足60%，但是大于40%时，限制底盘使用能量
-			}
-			else if (CAP_CANData.cap_energy <= 40 && CAP_CANData.cap_energy > 30)						//当电容电量不足40%，但是大于30%时，限制底盘使用能量
-			{
-				chassis_max_power = input_power + 20;	
-			}
-			else
-			{
-				chassis_max_power = input_power;
-			}
-		}
-
 	// 设置电容控制器的输入功率
-	CAP_CAN_DataSend(&CAP_CANData, input_power-5, CAP_ENABLE);
+	if(chassis_power_control->chassis_RC->key.v & KEY_PRESSED_OFFSET_F)
+	{chassis_max_power = 200;
+	 input_power = 0.8*max_power_limit;
+	 chassis_power_control->cap_flag = 1;
+	}
+	else{
+	//设置不同的需求功率，控制超电选择超电或者放电
+	chassis_power_control->cap_flag = 0;
+
+	if (CAP_CANData.cap_energy > 60)
+	{
+		chassis_max_power = input_power +  50; // 略大于最大功率，避免电容器一直充满，提高能量利用率 50
+	}
+	else if (CAP_CANData.cap_energy <= 60 && CAP_CANData.cap_energy > 40)
+	{
+		chassis_max_power = input_power + 30;    //当电容电量不足60%，但是大于40%时，限制底盘使用能量
+	}
+	else if (CAP_CANData.cap_energy <= 40 && CAP_CANData.cap_energy > 30)						//当电容电量不足40%，但是大于30%时，限制底盘使用能量
+	{
+		chassis_max_power = input_power + 10;	
+	}
+	else
+	{
+		chassis_max_power = input_power;
+	}
+	}
+		CAP_CAN_DataSend(&CAP_CANData, input_power-5, CAP_ENABLE);
 
 	for (uint8_t i = 0; i < 4; i++) // first get all the initial motor power and total motor power
 	{
@@ -142,30 +119,6 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 				continue;
 			}
 
-//	if (initial_total_power > chassis_max_power) // determine if larger than max power
-//  {
-//      // 计算前轮和后轮的总功率
-//      float front_wheels_power = initial_give_power[0] + initial_give_power[1];
-//      float rear_wheels_power = initial_give_power[2] + initial_give_power[3];
-//        
-//      // 根据后轮功率比例重新分配总功率
-//      float total_weighted_power = front_wheels_power + rear_wheels_power * rear_wheel_power_ratio;
-//        
-//      // 计算前轮和后轮的功率缩放比例
-//      fp32 front_power_scale = (chassis_max_power * front_wheels_power / total_weighted_power) / front_wheels_power;
-//      fp32 rear_power_scale = (chassis_max_power * rear_wheels_power * rear_wheel_power_ratio / total_weighted_power) / rear_wheels_power;
-//        
-//      // 应用不同的功率缩放比例
-//      for (uint8_t i = 0; i < 4; i++)
-//      {
-//          // 0、1为前轮，2、3为后轮
-//          fp32 power_scale = (i < 2) ? front_power_scale : rear_power_scale;
-//            
-//          scaled_give_power[i] = initial_give_power[i] * power_scale; // get scaled power
-//          if (scaled_give_power[i] < 0)
-//          {
-//              continue;
-//          }
 			fp32 b = toque_coefficient * chassis_power_control->motor_chassis[i].chassis_motor_measure->speed_rpm;
 			fp32 c = k2 * chassis_power_control->motor_chassis[i].chassis_motor_measure->speed_rpm * chassis_power_control->motor_chassis[i].chassis_motor_measure->speed_rpm - scaled_give_power[i] + constant;
 
@@ -192,3 +145,4 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 		}
 	}
 }
+

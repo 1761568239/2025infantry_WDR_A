@@ -30,7 +30,6 @@
   * @retval         none
   */
 extern void chassis_power_control(chassis_move_t *chassis_power_control);
-
 extern void Chassis_Power_Limit(chassis_move_t *chassis_power_control, fp32 k1, fp32 k2);
 
 #endif

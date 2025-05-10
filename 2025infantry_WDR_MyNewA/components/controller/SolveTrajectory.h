@@ -17,8 +17,8 @@
 #define AM12_LENTH (0.205/2)
 #define AM12_WIDE  (0.117/2)
 
-#define ARMOR_YAW_LIMIT_OFFSET 0.18f//0.22f
-#define ARMOR_YAW_LIMIT 0.5f//0.6f
+#define ARMOR_YAW_LIMIT_OFFSET 0.22f
+#define ARMOR_YAW_LIMIT 0.6f
 
 
 typedef unsigned char uint8_t;

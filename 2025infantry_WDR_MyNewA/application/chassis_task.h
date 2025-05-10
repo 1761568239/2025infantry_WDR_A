@@ -50,14 +50,22 @@
 #define M3505_MOTOR_SPEED_PID_MAX_OUT    MAX_MOTOR_CAN_CURRENT   //16000
 #define M3505_MOTOR_SPEED_PID_MAX_IOUT 	2500.0f                  //2000.0f
 
-//回中时缓慢回中，防止过冲
-#define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KP 4.5f      //7.5 
+//底盘电机速度环PID
+//第四个电机响应慢故单给一个PID进行控制
+#define M3505_MOTOR3_SPEED_PID_KP 20000.0f   //18500.0f    20000
+#define M3505_MOTOR3_SPEED_PID_KI 20.0f      //20.0f       30
+#define M3505_MOTOR3_SPEED_PID_KD 0.0f	
+#define M3505_MOTOR3_SPEED_PID_MAX_OUT    MAX_MOTOR_CAN_CURRENT   //16000
+#define M3505_MOTOR3_SPEED_PID_MAX_IOUT 	2500.0f                  //2000.0f
+	
+//底盘旋转跟随PID
+#define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KP 4.0f      //7.5 
 #define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KI 0.01f     //0
 #define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KD 0.10f  	//0.0
-//底盘旋转跟随PID
-#define CHASSIS_FOLLOW_GIMBAL_PID_KP 16.5f      //16.5
+//回中时缓慢回中，防止过冲
+#define CHASSIS_FOLLOW_GIMBAL_PID_KP 16.0f      //7.5     15
 #define CHASSIS_FOLLOW_GIMBAL_PID_KI 0.05f      //0      0.01
-#define CHASSIS_FOLLOW_GIMBAL_PID_KD 0.10f  	//0.1
+#define CHASSIS_FOLLOW_GIMBAL_PID_KD 0.10f  	//0.0
 #define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT    12.0f   //10
 #define CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT   0.5f    //0.5
 #define CHASSIS_FOLLOW_deadline      0.1f  			 //底盘跟随死区//0.1
@@ -83,7 +91,7 @@
 //选择底盘状态 开关通道号
 #define CHASSIS_MODE_CHANNEL 0
 //遥控器前进摇杆（max 660）转化成车体前进速度（m/s）的比例
-#define CHASSIS_VX_RC_SEN 0.006f
+#define CHASSIS_VX_RC_SEN 0.008f
 //遥控器左右摇杆（max 660）转化成车体左右速度（m/s）的比例
 #define CHASSIS_VY_RC_SEN 0.004f     //0.004
 //加速度滤波系数
@@ -114,9 +122,9 @@
 //m3508转化成底盘速度(m/s)的比例
 #define CHASSIS_MOTOR_RPM_TO_VECTOR_SEN  0.000299f  
 //单个底盘电机最大速度
-#define MAX_WHEEL_SPEED       8.0f   
+#define MAX_WHEEL_SPEED         8.0f   
 //底盘运动过程最大前进速度   			
-#define CHASSIS_MAX_SPEED_X 	2.5f  //2.0  
+#define CHASSIS_MAX_SPEED_X 	2.5f  //2.0   
 //底盘运动过程最大平移速度
 #define CHASSIS_MAX_SPEED_Y     2.5f  //2.0  
 //小陀螺转速
@@ -193,6 +201,7 @@ typedef struct
 
 	uint8_t gyroscope_flag;  //小陀螺旋转标志
 	uint8_t auto_flag;		 //自瞄标志
+	uint8_t cap_flag;        
 } chassis_move_t;
 /**********************************  枚举和结构体定义 *************************************/
 
@@ -222,6 +231,7 @@ extern void chassis_task(void const *pvParameters);
 extern void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *chassis_move_rc_to_vector);
 
 extern uint8_t *get_gyro_flag(void);
+extern uint8_t *get_cap_state(void);
 extern const chassis_move_t *get_chassic_control_point(void);
 /**********************************  函数申明 *************************************/
 

@@ -83,7 +83,7 @@
 #include "struct_typedef.h"
 
 #include "gimbal_task.h"
-#include "referee.h"
+
 
 typedef enum
 {

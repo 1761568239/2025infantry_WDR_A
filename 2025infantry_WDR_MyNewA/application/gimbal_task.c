@@ -558,6 +558,10 @@ static void gimbal_feedback_update(gimbal_control_t *feedback_update)
 
     feedback_update->gimbal_pitch_motor.relative_angle = motor_ecd_to_angle_change(feedback_update->gimbal_pitch_motor.gimbal_motor_measure->ecd,
                                                                                           feedback_update->gimbal_pitch_motor.offset_ecd);
+	if(feedback_update->gimbal_pitch_motor.relative_angle < 0 && feedback_update->gimbal_pitch_motor.relative_angle > -0.15f)
+		feedback_update->gimbal_pitch_motor.pitch_flag = 1;
+	else
+		feedback_update->gimbal_pitch_motor.pitch_flag = 0;
 #endif
 
     feedback_update->gimbal_pitch_motor.motor_gyro = *(feedback_update->gimbal_INT_gyro_point + INS_GYRO_Y_ADDRESS_OFFSET);
@@ -935,4 +939,9 @@ static void gimbal_PID_clear(gimbal_PID_t *gimbal_pid_clear)
 const gimbal_control_t *get_gimbal_control_point(void)
 {
 	return &gimbal_control;
+}
+
+uint8_t *get_pitch_flag(void)
+{
+	return &gimbal_control.gimbal_pitch_motor.pitch_flag;
 }

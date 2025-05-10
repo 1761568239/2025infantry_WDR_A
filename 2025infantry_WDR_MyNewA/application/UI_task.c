@@ -14,6 +14,7 @@
 extern RC_ctrl_t rc_ctrl;
 extern received_packed_t received_packed;
 extern uint8_t cap_state;
+extern chassis_move_t chassis_move;
 const CapDataTypedef *supercap_data;
 uint8_t *fric_data;
 uint8_t *gyro_data;
@@ -244,7 +245,7 @@ void UI_task_entry(void const *pvParameters)
 		Char_ReFresh(gyro_flag_data);
 		vTaskDelay(50);
 		//动态显示电容电量
-		if(cap_state == 1)
+		if(chassis_move.cap_flag == 1)
 		{
 			Char_Draw(&cap_vol_data,"cap",UI_Graph_Change,9 ,UI_Color_Yellow,24,strlen(cap_vol_data_string),4,UI_POS_X(100), UI_POS_Y(220),cap_vol_data_string);			
 			Line_Draw(&cap_energy_percent_line, "caV", UI_Graph_Change, 0, UI_Color_Yellow, 15,UI_POS_X(10),UI_POS_Y(300), UI_POS_X( UI_data.cap_remain_energy*3 +10), UI_POS_Y(300));
@@ -298,11 +299,11 @@ void UI_task_entry(void const *pvParameters)
 		UI_ReFresh(7, vision_vertical_line1,vision_vertical_line2,vision_vertical_line3,vision_vertical_line4,\
 				   vision_horizontal_line1,vision_horizontal_line2,vision_horizontal_line3); 
 		vTaskDelay(100);
-		UI_ReFresh(1, vision_horizontal_line4); 
+		UI_ReFresh(1, vision_horizontal_line4);  
 		vTaskDelay(100);
 		
 		//系统复位
-		if((rc_ctrl.key.v & KEY_PRESSED_OFFSET_R)&&(rc_ctrl.key.v & KEY_PRESSED_OFFSET_F))
+		if((rc_ctrl.key.v & KEY_PRESSED_OFFSET_R)&&(rc_ctrl.key.v & KEY_PRESSED_OFFSET_CTRL))
 		{
 			NVIC_SystemReset();
 		}

@@ -290,6 +290,7 @@ extern void get_shoot_speed_limit (uint16_t *shoot_limit);
 extern uint16_t get_remain_bullet_num(void);
 extern void get_current_bullet_speed(fp32 *bullet_speed);
 extern uint16_t get_robot_remain_HP(void);
+extern uint16_t get_robot_level(void);
 
 #endif
 

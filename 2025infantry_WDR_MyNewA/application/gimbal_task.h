@@ -190,6 +190,8 @@ typedef struct
 
 	fp32 relative_angle;     //rad 相对角度
 	fp32 relative_angle_set; //rad 相对角度设置值
+	uint8_t pitch_flag;     //pitch是否可以过狗洞
+	
 	fp32 absolute_angle;     //rad 绝对角度
 	fp32 absolute_angle_set; //rad 绝对角度设置值
 	fp32 motor_gyro;         //rad/s 电机角速度
@@ -277,6 +279,8 @@ extern bool_t cmd_cali_gimbal_hook(uint16_t *yaw_offset, uint16_t *pitch_offset,
 extern void set_cali_gimbal_hook(const uint16_t yaw_offset, const uint16_t pitch_offset, const fp32 max_yaw, const fp32 min_yaw, const fp32 max_pitch, const fp32 min_pitch);
 
 extern const gimbal_control_t *get_gimbal_control_point(void);
+
+extern uint8_t *get_pitch_flag(void);
 /**********************************  函数申明 *************************************/
 
 #endif

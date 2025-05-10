@@ -105,11 +105,6 @@ static void chassic_raw_control(fp32 vx_set, fp32 vy_set, fp32 angle_set, chassi
 chassis_move_t chassis_move;
 //========================================== 全局变量定义区域 ==============================================
 
-
-//========================================== 全局变量区域 ==============================================
-extern uint8_t cap_state;
-//========================================== 全局变量区域 ==============================================
-
 /**
   * @brief          底盘任务，间隔 CHASSIS_CONTROL_TIME_MS 2ms
   * @param[in]      pvParameters: 空
@@ -178,7 +173,8 @@ static void chassis_init(chassis_move_t *chassis_move_init)
         return;
     }
     //底盘速度环pid值
-    const static fp32 motor_speed_pid[3] = {M3505_MOTOR_SPEED_PID_KP, M3505_MOTOR_SPEED_PID_KI, M3505_MOTOR_SPEED_PID_KD};    
+    const static fp32 motor_speed_pid[3] = {M3505_MOTOR_SPEED_PID_KP, M3505_MOTOR_SPEED_PID_KI, M3505_MOTOR_SPEED_PID_KD}; 
+	const static fp32 motor_speed_pid_3[3] = {M3505_MOTOR3_SPEED_PID_KP, M3505_MOTOR3_SPEED_PID_KI, M3505_MOTOR3_SPEED_PID_KD};
     //底盘角度pid值
     const static fp32 chassis_yaw_pid[3] = {CHASSIS_FOLLOW_GIMBAL_PID_KP, CHASSIS_FOLLOW_GIMBAL_PID_KI, CHASSIS_FOLLOW_GIMBAL_PID_KD};
 	//底盘跟随慢速回中角度pid值
@@ -201,11 +197,13 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 	chassis_move_init->gimbal_control_point = get_gimbal_control_point();
     //获取底盘电机数据指针，初始化PID 
 	uint8_t i;
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 3; i++)
     {
         chassis_move_init->motor_chassis[i].chassis_motor_measure = get_chassis_motor_measure_point(i);
         PID_init(&chassis_move_init->motor_speed_pid[i], PID_POSITION, motor_speed_pid, M3505_MOTOR_SPEED_PID_MAX_OUT, M3505_MOTOR_SPEED_PID_MAX_IOUT);
     }
+		chassis_move_init->motor_chassis[3].chassis_motor_measure = get_chassis_motor_measure_point(3);
+        PID_init(&chassis_move_init->motor_speed_pid[3], PID_POSITION, motor_speed_pid_3 , M3505_MOTOR_SPEED_PID_MAX_OUT, M3505_MOTOR_SPEED_PID_MAX_IOUT);
     //初始化角度PID
     PID_init(&chassis_move_init->chassis_angle_pid, PID_POSITION, chassis_yaw_pid, CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT, CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
 	 //初始化角度PID，回中时降低速度，给定较小的PID参数
@@ -216,11 +214,11 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
     //最大 最小速度
-		chassis_move_init->vx_max_speed =  CHASSIS_MAX_SPEED_X;
-		chassis_move_init->vy_max_speed =  CHASSIS_MAX_SPEED_Y;	
-		chassis_move_init->vx_min_speed =  -CHASSIS_MAX_SPEED_X;
-		chassis_move_init->vy_min_speed =  -CHASSIS_MAX_SPEED_Y;				
-	    chassis_move_init->gyroscope_flag = 0;	
+    chassis_move_init->vx_max_speed =  CHASSIS_MAX_SPEED_X;
+    chassis_move_init->vx_min_speed = -CHASSIS_MAX_SPEED_Y;
+    chassis_move_init->vy_max_speed =  CHASSIS_MAX_SPEED_X;
+    chassis_move_init->vy_min_speed = -CHASSIS_MAX_SPEED_Y;
+	chassis_move_init->gyroscope_flag = 0;	
     //更新一下数据
     chassis_feedback_update(chassis_move_init);
 }
@@ -598,23 +596,20 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
     //计算pid
     for (i = 0; i < 4; i++)
     {
-				PID_calc(&chassis_move_control_loop->motor_speed_pid[i], chassis_move_control_loop->motor_chassis[i].speed, chassis_move_control_loop->motor_chassis[i].speed_set);
-		}
-		
-    //功率控制---通过功率控制限制功率
+        PID_calc(&chassis_move_control_loop->motor_speed_pid[i], chassis_move_control_loop->motor_chassis[i].speed, chassis_move_control_loop->motor_chassis[i].speed_set);
+    }
+//    //功率控制---通过功率控制限制功率
+	//上坡功率重分配
+	if(chassis_move_control_loop->chassis_pitch < -0.1f)
+	{
+		chassis_move_control_loop->motor_speed_pid[2].out *= 2.0f;
+		chassis_move_control_loop->motor_speed_pid[3].out *= 2.0f;
+	}		
 	chassis_power_control(chassis_move_control_loop);
     //赋值电流值
     for (i = 0; i < 4; i++)
     {
-			if(chassis_move.chassis_pitch > -0.1f)
         chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(chassis_move_control_loop->motor_speed_pid[i].out);
-			else
-			{
-				if(i < 2)
-					chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(chassis_move_control_loop->motor_speed_pid[i].out);
-				else
-					chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(chassis_move_control_loop->motor_speed_pid[i].out * 1.7f);
-			}
     }
 }
 
@@ -634,4 +629,9 @@ uint8_t *get_gyro_flag(void)
 const chassis_move_t *get_chassic_control_point(void)
 {
 	return &chassis_move;
+}
+
+uint8_t *get_cap_state()
+{
+	return &chassis_move.cap_flag;
 }

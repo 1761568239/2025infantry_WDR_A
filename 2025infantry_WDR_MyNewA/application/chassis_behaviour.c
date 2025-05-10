@@ -142,45 +142,45 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
     //遥控器设置模式
     if (switch_is_up(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]))
     {
-			if(chassis_move_mode->gimbal_control_point->auto_gyro_mode == GIMBAL_UP_GYRO)  
-			{
-				chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;	     //小陀螺
-				
-			}else
-			{              
-				chassis_behaviour_mode = CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW;  //自瞄
-			}		
+		if(chassis_move_mode->gimbal_control_point->auto_gyro_mode == GIMBAL_UP_GYRO)  
+		{
+			chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;	     //小陀螺
+			
+		}else
+		{              
+			chassis_behaviour_mode = CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW;  //自瞄
+		}		
     }
     else if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]))
     {
-			chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
-			chassis_move_mode->gyroscope_flag = 0;  
-			chassis_move_mode->auto_flag = 0;
+		chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
+		chassis_move_mode->gyroscope_flag = 0;  
+		chassis_move_mode->auto_flag = 0;
     }
     else if (switch_is_mid(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]))
     {			
-			if((chassis_move_mode->chassis_RC->key.v & KEY_PRESSED_OFFSET_SHIFT)&& !chassis_move_mode->gyroscope_flag)  //KEY_PRESSED_OFFSET_SHIFT
-			{
-				chassis_move_mode->gyroscope_flag = 1;//小陀螺标志位
-			}
-			else if((chassis_move_mode->chassis_RC->key.v & KEY_PRESSED_OFFSET_Z) && chassis_move_mode->gyroscope_flag)
-			{
-				chassis_move_mode->gyroscope_flag = 0;        
-			}
-			if(chassis_move_mode->chassis_RC->mouse.press_r )	
-				chassis_move_mode->auto_flag = 1;    //自瞄标志位
-			else if(!chassis_move_mode->chassis_RC->mouse.press_r )
-				chassis_move_mode->auto_flag = 0;
-		
-			if(get_robot_remain_HP() == 0)    //阵亡清空标志位，防止复活后状态混乱
-			{
-				chassis_move_mode->gyroscope_flag = 0;  
-				chassis_move_mode->auto_flag = 0;		
-			}
-			if(chassis_move_mode->gyroscope_flag)
-				chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;
-			else
-				chassis_behaviour_mode = CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW; 
+		if((chassis_move_mode->chassis_RC->key.v & KEY_PRESSED_OFFSET_SHIFT)&& !chassis_move_mode->gyroscope_flag)  //KEY_PRESSED_OFFSET_SHIFT
+		{
+			chassis_move_mode->gyroscope_flag = 1;//小陀螺标志位
+		}
+		else if((chassis_move_mode->chassis_RC->key.v & KEY_PRESSED_OFFSET_Z) && chassis_move_mode->gyroscope_flag)
+		{
+			chassis_move_mode->gyroscope_flag = 0;        
+		}
+		if(chassis_move_mode->chassis_RC->mouse.press_r )	
+			chassis_move_mode->auto_flag = 1;    //自瞄标志位
+		else if(!chassis_move_mode->chassis_RC->mouse.press_r )
+			chassis_move_mode->auto_flag = 0;
+	
+		if(get_robot_remain_HP() == 0)    //阵亡清空标志位，防止复活后状态混乱
+		{
+			chassis_move_mode->gyroscope_flag = 0;  
+			chassis_move_mode->auto_flag = 0;		
+		}
+		if(chassis_move_mode->gyroscope_flag)
+			chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;
+		else
+			chassis_behaviour_mode = CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW; 
     }
 	//当云台在某些模式下，像初始化， 底盘不动
     if (gimbal_cmd_to_chassis_stop())

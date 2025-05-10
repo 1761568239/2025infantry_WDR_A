@@ -310,6 +310,15 @@ uint16_t get_remain_bullet_num(void)
 }
 
 /**
+  * @brief		获取机器人当前等级
+  * @retval		&shoot
+  */
+uint16_t get_robot_level(void)
+{
+	return robot_state.robot_level;
+}
+
+/**
   * @brief          读取当前弹速
   * @param[out]     bullet_speed:当前弹速指针
   * @param[out]     none
