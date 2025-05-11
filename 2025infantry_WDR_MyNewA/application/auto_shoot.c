@@ -202,6 +202,7 @@ void Auto_Track(gimbal_control_t *gimbal_control_set)
   * @brief    串口中断函数          
   * @retval   无      
   */
+//该函数在stm32f4xx_it.c中
 void USART1_IRQHandler(void)  
 {
 	if(RESET != __HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))

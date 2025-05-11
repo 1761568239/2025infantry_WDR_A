@@ -39,6 +39,7 @@
 #include "voltage_task.h"
 
 #include "auto_shoot.h"
+#include "iwdg.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -77,6 +78,7 @@ osThreadId testHandle;
 osThreadId SUPERCAPHandle;
 osThreadId AUTO_taskHandle;
 osThreadId UI_taskHandle;
+osThreadId WatchdogHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -84,9 +86,10 @@ osThreadId UI_taskHandle;
 /* USER CODE END FunctionPrototypes */
 
 void test_task(void const * argument);
-extern void supercap_task(void const * argument);
+//extern void supercap_task(void const * argument);
 extern void auto_task(void const * argument);
 extern void UI_task_entry(void const * argument);
+void Watchdog_Task(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -151,20 +154,24 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of test */
-  osThreadDef(test, test_task, osPriorityNormal, 0, 256);
+  osThreadDef(test, test_task, osPriorityNormal, 0, 128);
   testHandle = osThreadCreate(osThread(test), NULL);
- 
+
   /* definition and creation of SUPERCAP */
 //  osThreadDef(SUPERCAP, supercap_task, osPriorityIdle, 0, 128);
 //  SUPERCAPHandle = osThreadCreate(osThread(SUPERCAP), NULL);
-	
+
   /* definition and creation of AUTO_task */
-  osThreadDef(AUTO_task, auto_task, osPriorityAboveNormal, 0, 512);
+  osThreadDef(AUTO_task, auto_task, osPriorityAboveNormal, 0, 256);
   AUTO_taskHandle = osThreadCreate(osThread(AUTO_task), NULL);
 
   /* definition and creation of UI_task */
-  osThreadDef(UI_task, UI_task_entry, osPriorityNormal, 0, 512);
+  osThreadDef(UI_task, UI_task_entry, osPriorityAboveNormal, 0, 256);
   UI_taskHandle = osThreadCreate(osThread(UI_task), NULL);
+
+  /* definition and creation of Watchdog */
+  osThreadDef(Watchdog, Watchdog_Task, osPriorityIdle, 0, 128);
+  WatchdogHandle = osThreadCreate(osThread(Watchdog), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -199,6 +206,7 @@ void MX_FREERTOS_Init(void) {
 //    servo_task_handle = osThreadCreate(osThread(SERVO), NULL);
 
   /* USER CODE END RTOS_THREADS */
+
 }
 
 /* USER CODE BEGIN Header_test_task */
@@ -211,7 +219,7 @@ void MX_FREERTOS_Init(void) {
 __weak void test_task(void const * argument)
 {
   /* init code for USB_DEVICE */
-  
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN test_task */
   /* Infinite loop */
   for(;;)
@@ -221,9 +229,28 @@ __weak void test_task(void const * argument)
   /* USER CODE END test_task */
 }
 
+/* USER CODE BEGIN Header_Watchdog_Task */
+/**
+* @brief Function implementing the Watchdog thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Watchdog_Task */
+int debug_1 = 0;
+void Watchdog_Task(void const * argument)//临时方案 待完善
+{
+  /* USER CODE BEGIN Watchdog_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+		debug_1++;
+    osDelay(1000);						 // 喂狗间隔 1秒（小于看门狗超时3秒）
+		HAL_IWDG_Refresh(&hiwdg);  // 喂狗
+  }
+  /* USER CODE END Watchdog_Task */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
      
 /* USER CODE END Application */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

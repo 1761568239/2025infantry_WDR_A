@@ -20,6 +20,8 @@
 #define ARMOR_YAW_LIMIT_OFFSET 0.22f
 #define ARMOR_YAW_LIMIT 0.6f
 
+#define ARMOR_YAW_HIGH_SPEED_LIMIT 0.2f
+
 
 typedef unsigned char uint8_t;
 enum ARMOR_ID

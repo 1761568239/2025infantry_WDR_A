@@ -72,7 +72,7 @@ void st_Data_Iint(void)
  */
 
 //float smoothing_factor = 1.0f; // 平滑系数，可以根据实际情况调整 越大越相信预测结果
-float calculate_dynamic_smoothing_factor(float v_yaw, uint8_t armor_id) 
+float calculate_dynamic_smoothing_factor(float v_yaw, uint8_t armor_id) //根据现象简单偏置
 {
     // 前哨站特殊处理
     if (armor_id == ARMOR_OUTPOST) {
@@ -83,10 +83,10 @@ float calculate_dynamic_smoothing_factor(float v_yaw, uint8_t armor_id)
 		
 		if(factor <= 0.2f)    // 确保平滑系数不会低于最小值，防止负值或过小值
 			return 0.2f;
-		else if (factor > 0.2f && factor <= 1.5f)
+		else if (factor > 0.2f && factor <= 2.0f)
 			return factor;
 		else
-			return 1.5f;
+			return 2.0f;
 }
 
 /*
@@ -130,12 +130,12 @@ void autoSolveTrajectory(float *pitch, float *yaw, float *aim_x, float *aim_y, f
     pre_yc = yc + st.vyw * fly_time;
     pre_yaw = armor_yaw + st.v_yaw * fly_time;
 
-		float filtered_v_yaw = alpha * v_yaw + (1.0f - alpha) * last_filtered_v_yaw; // 低通滤波
-		last_filtered_v_yaw	 = 	filtered_v_yaw;
-		watch_debug_1 = v_yaw;
-		watch_debug_2 = filtered_v_yaw;
-		smoothing_factor = calculate_dynamic_smoothing_factor(filtered_v_yaw, st.armor_id);//预测权重，可以根据实际情况调整 越大越相信预测结果
-		
+//		float filtered_v_yaw = alpha * v_yaw + (1.0f - alpha) * last_filtered_v_yaw; // 低通滤波
+//		last_filtered_v_yaw	 = 	filtered_v_yaw;
+//		watch_debug_1 = v_yaw;
+//		watch_debug_2 = filtered_v_yaw;
+		smoothing_factor = calculate_dynamic_smoothing_factor(v_yaw, st.armor_id);//预测权重，可以根据实际情况调整 越大越相信预测结果
+
     control_status = 0;
     if(fabsf(st.v_yaw) < 1.5f && received_packed.tracking == 1)
     {
@@ -190,7 +190,7 @@ void autoSolveTrajectory(float *pitch, float *yaw, float *aim_x, float *aim_y, f
         }
     }
     if( control_status != 0)
-    {        
+    {
         float temp_pitch = 0.0f;
         solver(DEFAULT_VEL, st.k, sqrt((*aim_x) * (*aim_x) + (*aim_y) * (*aim_y)) - st.s_bias, *aim_z, &temp_pitch);
         if(temp_pitch)

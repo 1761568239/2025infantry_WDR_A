@@ -37,7 +37,7 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
-extern fifo_s_t auto_shoot_fifo;   //×ÔÃé½â°ü
+extern fifo_s_t auto_shoot_fifo;   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 /* USER CODE END PV */
 
@@ -340,5 +340,3 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

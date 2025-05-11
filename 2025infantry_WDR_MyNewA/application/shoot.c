@@ -137,25 +137,33 @@ int16_t shoot_control_loop(void)
     }
 	else if (shoot_control.shoot_mode == OPEN_TRIGGER)   //设置射频
     {
-		if(gimbal_behaviour == GIMBAL_AUTO)
-		{
-			if(shoot_control.heat_limit < 90.0f)  //总热量小于90时射频给低
-				shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED;
-			else
-			  shoot_control.trigger_speed_set = AUTO_TRIGGER_SPEED;    //20自瞄射频高一点
-		}
-		else
-		{ 
-			if(shoot_control.mouse_state == MOUSE_SHORT_PRESS || shoot_control.trigger_down_state ==TRIGGER_DOWN_SHORT)
+			if(gimbal_behaviour == GIMBAL_AUTO)
 			{
-				shoot_control.trigger_speed_set = TRIGGER_SPEED;   //5 鼠标短按或者遥杆短时间打下 
-			}	
-			else if(shoot_control.mouse_state == MOUSE_LONG_PRESS || shoot_control.trigger_down_state ==TRIGGER_DOWN_LONG)
-			{
-				shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED; //10 鼠标长按或者遥杆长时间打下
+				if(shoot_control.heat_limit < 90.0f)  //总热量小于90时射频给低
+				{
+					shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED;
+					if(fabsf(st.v_yaw) > 4.0f)
+						shoot_control.trigger_speed_set = 15.0f;    //15 识别对象高转速时 自瞄射频高一点
+				}
+				else
+				{
+					shoot_control.trigger_speed_set = AUTO_TRIGGER_SPEED;    //20 自瞄射频高一点
+					if(fabsf(st.v_yaw) > 4.0f)
+						shoot_control.trigger_speed_set = AUTO_TRIGGER_SPEED_HIGH_V_YAW;    //30 识别对象高转速时 自瞄射频高一点
+				}
 			}
-		}
-		trigger_motor_turn_back();
+			else
+			{
+				if(shoot_control.mouse_state == MOUSE_SHORT_PRESS || shoot_control.trigger_down_state ==TRIGGER_DOWN_SHORT)
+				{
+					shoot_control.trigger_speed_set = TRIGGER_SPEED;   //5 鼠标短按或者遥杆短时间打下 
+				}	
+				else if(shoot_control.mouse_state == MOUSE_LONG_PRESS || shoot_control.trigger_down_state ==TRIGGER_DOWN_LONG)
+				{
+					shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED; //10 鼠标长按或者遥杆长时间打下
+				}
+			}
+			trigger_motor_turn_back();
     }
 	//由旋转切换至停止状态
     if(shoot_control.shoot_mode == SHOOT_STOP)

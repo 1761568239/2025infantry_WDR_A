@@ -79,9 +79,10 @@
 //电机rmp 变化成 旋转速度的比例
 #define MOTOR_RPM_TO_SPEED          0.00290888208665721596153948461415f 
 //拨弹速度
-#define TRIGGER_SPEED               -5.0f     //-5
-#define CONTINUE_TRIGGER_SPEED      -8.0f		//10.0
-#define AUTO_TRIGGER_SPEED          -20.0f	  //20.0
+#define TRIGGER_SPEED                 -5.0f     //-5
+#define CONTINUE_TRIGGER_SPEED        -8.0f		//10.0
+#define AUTO_TRIGGER_SPEED            -20.0f	  //20.0
+#define AUTO_TRIGGER_SPEED_HIGH_V_YAW -30.0f
 //卡单时间 以及反转时间
 #define BLOCK_TRIGGER_SPEED         2.0f
 #define BLOCK_TIME                  1000   //1000
