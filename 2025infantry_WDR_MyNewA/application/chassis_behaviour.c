@@ -128,6 +128,9 @@ chassis_behaviour_e chassis_behaviour_mode      = CHASSIS_ZERO_FORCE;
 chassis_behaviour_e last_chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
 //========================================== 全局变量定义区域 ==============================================
 
+extern gimbal_behaviour_e gimbal_behaviour;
+extern gimbal_behaviour_e last_gimbal_behaviour;
+
 /**
   * @brief          通过逻辑判断，赋值"chassis_behaviour_mode"成哪种模式
   * @param[in]      chassis_move_mode: 底盘数据
@@ -144,7 +147,7 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
     {
 			if(chassis_move_mode->gimbal_control_point->auto_gyro_mode == GIMBAL_UP_GYRO)  
 			{
-				chassis_behaviour_mode = CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW;//CHASSIS_NO_FOLLOW_YAW;	     //小陀螺
+				chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;	     //小陀螺
 				
 			}else
 			{              
@@ -158,7 +161,7 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
 			chassis_move_mode->auto_flag = 0;
     }
     else if (switch_is_mid(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]))
-    {			
+    {
 		if((chassis_move_mode->chassis_RC->key.v & KEY_PRESSED_OFFSET_SHIFT)&& !chassis_move_mode->gyroscope_flag)  //KEY_PRESSED_OFFSET_SHIFT
 		{
 			chassis_move_mode->gyroscope_flag = 1;//小陀螺标志位
@@ -176,6 +179,10 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
 		{
 			chassis_move_mode->gyroscope_flag = 0;  
 			chassis_move_mode->auto_flag = 0;		
+			chassis_behaviour_mode      = CHASSIS_ZERO_FORCE;
+			last_chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
+			gimbal_behaviour      = GIMBAL_ZERO_FORCE;
+      last_gimbal_behaviour = GIMBAL_ZERO_FORCE;
 		}
 		if(chassis_move_mode->gyroscope_flag)
 			chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;

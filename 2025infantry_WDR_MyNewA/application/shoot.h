@@ -80,7 +80,7 @@
 #define MOTOR_RPM_TO_SPEED          0.00290888208665721596153948461415f 
 //拨弹速度
 #define TRIGGER_SPEED                 -5.0f     //-5
-#define CONTINUE_TRIGGER_SPEED        -8.0f		//10.0
+#define CONTINUE_TRIGGER_SPEED        -7.0f		//10.0
 #define AUTO_TRIGGER_SPEED            -20.0f	  //20.0
 #define AUTO_TRIGGER_SPEED_HIGH_V_YAW -30.0f
 //卡单时间 以及反转时间
@@ -92,7 +92,7 @@
 #define PI_FIVE 					0.628318530717958647692528676655f
 #define PI_TEN                      0.314f
 //热量限制保留，防止操作手超热量
-#define SHOOT_HEAT_REMAIN_VALUE_MAX     40  //50
+#define SHOOT_HEAT_REMAIN_VALUE_MAX     30  //50
 #define SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX 80
 //3508转换为速度
 #define M3508_MOTOR_RPM_TO_VECTOR 0.000415809748903494517209f 

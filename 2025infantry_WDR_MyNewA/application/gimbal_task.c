@@ -210,10 +210,13 @@ static int16_t yaw_can_set_current = 0, pitch_can_set_current = 0, shoot_can_set
   * @param[in]      pvParameters: 空
   * @retval         none
   */
+extern	uint16_t imu_toe;
 void gimbal_task(void const *pvParameters)
 {
     //等待陀螺仪任务更新陀螺仪数据
+	while(imu_toe){
     vTaskDelay(GIMBAL_TASK_INIT_TIME);
+	}
     //云台初始化
     gimbal_init(&gimbal_control);
     //射击初始化

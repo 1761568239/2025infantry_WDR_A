@@ -172,7 +172,8 @@ fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f};      //euler angle, unit rad.Å·À­½Ç µ¥Î»
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
-
+extern void buzzer_on(uint16_t psc, uint16_t pwm);
+uint16_t imu_toe = 1;
 void INS_task(void const *pvParameters)
 {
     //wait a time
@@ -180,12 +181,13 @@ void INS_task(void const *pvParameters)
     while(BMI088_init())
     {
         osDelay(100);
+			
     }
     while(ist8310_init())
     {
         osDelay(100);
     }
-
+		imu_toe = 0;
     BMI088_read(bmi088_real_data.gyro, bmi088_real_data.accel, &bmi088_real_data.temp);
     //rotate and zero drift 
     imu_cali_slove(INS_gyro, INS_accel, INS_mag, &bmi088_real_data, &ist8310_real_data);

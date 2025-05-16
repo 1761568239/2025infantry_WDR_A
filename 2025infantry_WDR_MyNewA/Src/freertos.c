@@ -154,7 +154,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of test */
-  osThreadDef(test, test_task, osPriorityNormal, 0, 128);
+  osThreadDef(test, test_task, osPriorityIdle, 0, 128);
   testHandle = osThreadCreate(osThread(test), NULL);
 
   /* definition and creation of SUPERCAP */
@@ -166,7 +166,7 @@ void MX_FREERTOS_Init(void) {
   AUTO_taskHandle = osThreadCreate(osThread(AUTO_task), NULL);
 
   /* definition and creation of UI_task */
-  osThreadDef(UI_task, UI_task_entry, osPriorityAboveNormal, 0, 256);
+  osThreadDef(UI_task, UI_task_entry, osPriorityNormal, 0, 256);
   UI_taskHandle = osThreadCreate(osThread(UI_task), NULL);
 
   /* definition and creation of Watchdog */
@@ -178,19 +178,19 @@ void MX_FREERTOS_Init(void) {
 	osThreadDef(cali, calibrate_task, osPriorityNormal, 1, 512);
 	calibrate_tast_handle = osThreadCreate(osThread(cali), NULL);
 
-	osThreadDef(ChassisTask, chassis_task, osPriorityNormal, 0, 512);
+	osThreadDef(ChassisTask, chassis_task, osPriorityAboveNormal, 0, 512);
 	chassisTaskHandle = osThreadCreate(osThread(ChassisTask), NULL);
 
 	osThreadDef(DETECT, detect_task, osPriorityNormal, 0, 256);
 	detect_handle = osThreadCreate(osThread(DETECT), NULL);
 
-	osThreadDef(gimbalTask, gimbal_task, osPriorityNormal, 0, 1024);
+	osThreadDef(gimbalTask, gimbal_task, osPriorityHigh, 0, 1024);
 	gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
 
 	osThreadDef(imuTask, INS_task, osPriorityRealtime, 0, 1024);
 	imuTaskHandle = osThreadCreate(osThread(imuTask), NULL);
 
-	osThreadDef(led, led_RGB_flow_task, osPriorityNormal, 0, 256);
+	osThreadDef(led, led_RGB_flow_task, osPriorityLow, 0, 256);
 	led_RGB_flow_handle = osThreadCreate(osThread(led), NULL);
 
 	osThreadDef(REFEREE, referee_usart_task, osPriorityNormal, 0, 128);

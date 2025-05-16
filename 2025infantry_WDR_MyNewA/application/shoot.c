@@ -239,28 +239,28 @@ static void shoot_set_mode(void)
 	   && fabs(shoot_control.shoot_speed_r - shoot_control.shoot_speed_set_r) < 0.4f)
 	{
 #if REFEREE
-//	//如果当前裁判系统没问题，且热量余量高于限制值      
-//	if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX <= shoot_control.heat_limit) && gimbal_behaviour == GIMBAL_AUTO)
-//		shoot_flag = 1;
-//	else if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_MAX <= shoot_control.heat_limit))
-//		shoot_flag = 1;
-//	else00
-//		shoot_flag = 0;
+	//如果当前裁判系统没问题，且热量余量高于限制值      
+	if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX <= shoot_control.heat_limit) && gimbal_behaviour == GIMBAL_AUTO)
+		shoot_flag = 1;
+	else if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_MAX <= shoot_control.heat_limit))
+		shoot_flag = 1;
+	else
+		shoot_flag = 0;
 	//如果当前裁判系统没问题，且热量余量高于限制值
-	if(shoot_control.heat_limit < 90.0f)  //针对1、2级冷却优先模式热量上限 <= 85时，预留49热量防超热量  此时自瞄弹频为10
-	{
-		if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_MAX <= shoot_control.heat_limit))
-			shoot_flag = 1;	
-		else
-			shoot_flag = 0;
-	}
-	else																	//热量 >= 85 时，热量优先或等级足够的冷却优先，预留90热量（主要给自瞄时的高射频留足余量）
-	{
-		if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX <= shoot_control.heat_limit))
-			shoot_flag = 1;	
-		else
-			shoot_flag = 0;
-	}
+//	if(shoot_control.heat_limit < 90.0f)  //针对1、2级冷却优先模式热量上限 <= 85时，预留49热量防超热量  此时自瞄弹频为10
+//	{
+//		if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_MAX <= shoot_control.heat_limit))
+//			shoot_flag = 1;	
+//		else
+//			shoot_flag = 0;
+//	}
+//	else																	//热量 >= 85 时，热量优先或等级足够的冷却优先，预留90热量（主要给自瞄时的高射频留足余量）
+//	{
+//		if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX <= shoot_control.heat_limit))
+//			shoot_flag = 1;	
+//		else
+//			shoot_flag = 0;
+//	}
 
 #else
 	shoot_flag = 1;

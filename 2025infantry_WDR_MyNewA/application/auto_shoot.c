@@ -61,7 +61,7 @@ void AUTO_init(void)            //³õÊ¼»¯´®¿ÚÓëDMA£¬ÉèÖÃÊı¾İ³¤¶È
 
 /**
   * @brief          ¶ÔÖĞ¶Ï½ÓÊÕÍêµÄÊı¾İ½øĞĞ½â°üºÍĞ£Ñéºó·ÅÈë×ÔÃé½ÓÊÕ½á¹¹Ìå
-  * @param[in]      ÎŞ
+  * @param[in]      Î Ş
   * @retval         ÎŞ
   */
 static void autoshoot_unpack_fifo_data(void)
@@ -221,7 +221,7 @@ void UART1_receive_IDE(void)
 {
 	static uint16_t check_sum = 0;
 	HAL_UART_DMAStop(&huart1);  //Í£Ö¹DMA´«Êä
-	fifo_s_puts(&auto_shoot_fifo, (char*)RX_buf, DATE_LENGTH);    //ÏÖÔÚ·ÅÔÚĞéÄâ´®¿Ú½ÓÊÕÀïÃæ
+//	fifo_s_puts(&auto_shoot_fifo, (char*)RX_buf, DATE_LENGTH);    //ÏÖÔÚ·ÅÔÚĞéÄâ´®¿Ú½ÓÊÕÀïÃæ
 	HAL_UART_Receive_DMA(&huart1,RX_buf, RX_BUF_NUM);  //´ò¿ªDMA¼ÌĞø½ÓÊÕ
 }
 

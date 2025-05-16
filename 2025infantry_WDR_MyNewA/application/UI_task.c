@@ -128,18 +128,18 @@ void UI_task_entry(void const *pvParameters)
 
 	Rectangle_Draw(&AT_ID_rectangle, "re2", UI_Graph_ADD, 5, UI_Color_Cyan, 3, 936, 745, 1016, 675); 		
 	
-	//弹道线
-	Line_Draw(&Shoot_horizontal_line1, "ho1", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(910), UI_POS_Y(640+25), UI_POS_X(930),  UI_POS_Y(640+25));  //左上水平线
-	Line_Draw(&Shoot_horizontal_line2, "ho2", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(960), UI_POS_Y(640+25), UI_POS_X(980), UI_POS_Y(640+25)); //右上 
-	Line_Draw(&Shoot_horizontal_line3, "ho3", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(910),  UI_POS_Y(600+25), UI_POS_X(930),  UI_POS_Y(600+25));   //左下
-	Line_Draw(&Shoot_horizontal_line4, "ho4", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(960),  UI_POS_Y(600+25), UI_POS_X(980), UI_POS_Y(600+25));  //右下
-	Line_Draw(&Shoot_horizontal_line5, "ho5", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(910),  UI_POS_Y(620+25), UI_POS_X(980), UI_POS_Y(620+25));  //中间
+	//弹道线  上加下减  左加右减
+	Line_Draw(&Shoot_horizontal_line1, "ho1", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(920+5), UI_POS_Y(630-10), UI_POS_X(940+5),  UI_POS_Y(630-10));  //左上水平线
+	Line_Draw(&Shoot_horizontal_line2, "ho2", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(970+5), UI_POS_Y(630-10), UI_POS_X(990+5), UI_POS_Y(630-10)); //右上 
+	Line_Draw(&Shoot_horizontal_line3, "ho3", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(920+5),  UI_POS_Y(590-10), UI_POS_X(940+5),  UI_POS_Y(590-10));   //左下
+	Line_Draw(&Shoot_horizontal_line4, "ho4", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(970+5),  UI_POS_Y(590-10), UI_POS_X(990+5), UI_POS_Y(590-10));  //右下
+	Line_Draw(&Shoot_horizontal_line5, "ho5", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(920+5),  UI_POS_Y(610-10), UI_POS_X(990+5), UI_POS_Y(610-10));  //中间
 	
-	Line_Draw(&Shoot_vertical_line1, "ve1", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(930), UI_POS_Y(640+25), UI_POS_X(930), UI_POS_Y(685+25));    //左上竖直线
-	Line_Draw(&Shoot_vertical_line2, "ve2", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(960), UI_POS_Y(640+25), UI_POS_X(960), UI_POS_Y(685+25));    //右上 
-	Line_Draw(&Shoot_vertical_line3, "ve3", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(930), UI_POS_Y(600+25), UI_POS_X(930), UI_POS_Y(545+25));    //左下
-	Line_Draw(&Shoot_vertical_line4, "ve4", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(960), UI_POS_Y(600+25), UI_POS_X(960), UI_POS_Y(545+25));    //右下
-	Line_Draw(&Shoot_vertical_line5, "ve5", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(945), UI_POS_Y(685+25), UI_POS_X(945), UI_POS_Y(545+25));    //中间
+	Line_Draw(&Shoot_vertical_line1, "ve1", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(940+5), UI_POS_Y(630-10), UI_POS_X(940+5), UI_POS_Y(675-10));    //左上竖直线
+	Line_Draw(&Shoot_vertical_line2, "ve2", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(970+5), UI_POS_Y(630-10), UI_POS_X(970+5), UI_POS_Y(675-10));    //右上 
+	Line_Draw(&Shoot_vertical_line3, "ve3", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(940+5), UI_POS_Y(590-10), UI_POS_X(940+5), UI_POS_Y(535-10));    //左下
+	Line_Draw(&Shoot_vertical_line4, "ve4", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(970+5), UI_POS_Y(590-10), UI_POS_X(970+5), UI_POS_Y(535-10));    //右下
+	Line_Draw(&Shoot_vertical_line5, "ve5", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(955+5), UI_POS_Y(675-10), UI_POS_X(955+5), UI_POS_Y(535-10));    //中间
 
 	//自瞄框
 	Line_Draw(&vision_horizontal_line1, "hl1", UI_Graph_ADD, 0, UI_Color_Cyan, 3, 716, 735, 746, 735);

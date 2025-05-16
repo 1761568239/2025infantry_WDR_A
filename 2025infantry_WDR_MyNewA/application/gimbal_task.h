@@ -66,9 +66,9 @@
 #define YAW_SPEED_PID_MAX_IOUT  20000.0f		   //20000
 
 //yaw 角度环 角度由陀螺仪解算 PID参数以及 PID最大输出，积分输出
-#define YAW_GYRO_ABSOLUTE_PID_KP        18.0f      //10
+#define YAW_GYRO_ABSOLUTE_PID_KP        10.0f      //18
 #define YAW_GYRO_ABSOLUTE_PID_KI        0.0f       //0
-#define YAW_GYRO_ABSOLUTE_PID_KD        0.375      //0.3
+#define YAW_GYRO_ABSOLUTE_PID_KD        0.3f      //0.375
 #define YAW_GYRO_ABSOLUTE_PID_MAX_OUT   15.0f      //15
 #define YAW_GYRO_ABSOLUTE_PID_MAX_IOUT  0.0f       //0
 
@@ -82,7 +82,7 @@
 
 /**********************************  其他宏定义常量 *************************************/
 //任务初始化 空闲一段时间
-#define GIMBAL_TASK_INIT_TIME 201
+#define GIMBAL_TASK_INIT_TIME 2000
 //yaw,pitch控制通道以及状态开关通道
 #define YAW_CHANNEL   2
 #define PITCH_CHANNEL 3

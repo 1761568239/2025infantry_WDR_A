@@ -31,7 +31,7 @@ void MX_IWDG_Init(void)
 {
 
   /* USER CODE BEGIN IWDG_Init 0 */
-
+#if !defined(__DEBUG) && !defined(DEBUG)  // Keil/IAR/CubeIDE µÄµ÷ÊÔºê
   /* USER CODE END IWDG_Init 0 */
 
   /* USER CODE BEGIN IWDG_Init 1 */
@@ -45,7 +45,7 @@ void MX_IWDG_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN IWDG_Init 2 */
-
+#endif
   /* USER CODE END IWDG_Init 2 */
 
 }
