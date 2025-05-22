@@ -19,7 +19,8 @@ const CapDataTypedef *supercap_data;
 uint8_t *fric_data;
 uint8_t *gyro_data;
 UI_data_t UI_data;
-
+int temp = 0;	
+int temp_y = 30;
 /****************************  UI数据 ******************************/
 //字符传图形
 String_Data fric_flag_data;
@@ -127,19 +128,20 @@ void UI_task_entry(void const *pvParameters)
 	Line_Draw(&Car_line_R, "sh2", UI_Graph_ADD, 5, UI_Color_Yellow, 3, UI_POS_X(1130+130), UI_POS_Y(1014), UI_POS_X(985+130), UI_POS_Y(793));	
 
 	Rectangle_Draw(&AT_ID_rectangle, "re2", UI_Graph_ADD, 5, UI_Color_Cyan, 3, 936, 745, 1016, 675); 		
-	
+
 	//弹道线  上加下减  左加右减
-	Line_Draw(&Shoot_horizontal_line1, "ho1", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(920+5), UI_POS_Y(630-10), UI_POS_X(940+5),  UI_POS_Y(630-10));  //左上水平线
-	Line_Draw(&Shoot_horizontal_line2, "ho2", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(970+5), UI_POS_Y(630-10), UI_POS_X(990+5), UI_POS_Y(630-10)); //右上 
-	Line_Draw(&Shoot_horizontal_line3, "ho3", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(920+5),  UI_POS_Y(590-10), UI_POS_X(940+5),  UI_POS_Y(590-10));   //左下
-	Line_Draw(&Shoot_horizontal_line4, "ho4", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(970+5),  UI_POS_Y(590-10), UI_POS_X(990+5), UI_POS_Y(590-10));  //右下
-	Line_Draw(&Shoot_horizontal_line5, "ho5", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(920+5),  UI_POS_Y(610-10), UI_POS_X(990+5), UI_POS_Y(610-10));  //中间
+	Line_Draw(&Shoot_horizontal_line1, "ho1", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(920+5+temp), UI_POS_Y(630-10+temp_y), UI_POS_X(940+5+temp),  UI_POS_Y(630-10+temp_y));  //左上水平线
+	Line_Draw(&Shoot_horizontal_line2, "ho2", UI_Graph_ADD,4, UI_Color_Orange, 2, UI_POS_X(970+5+temp), UI_POS_Y(630-10+temp_y), UI_POS_X(990+5+temp), UI_POS_Y(630-10+temp_y)); //右上 
+	Line_Draw(&Shoot_horizontal_line3, "ho3", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(920+5+temp),  UI_POS_Y(590-10+temp_y), UI_POS_X(940+5+temp),  UI_POS_Y(590-10+temp_y));   //左下
+	Line_Draw(&Shoot_horizontal_line4, "ho4", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(970+5+temp),  UI_POS_Y(590-10+temp_y), UI_POS_X(990+5+temp), UI_POS_Y(590-10+temp_y));  //右下
+	Line_Draw(&Shoot_horizontal_line5, "ho5", UI_Graph_ADD,4, UI_Color_Green, 2, UI_POS_X(920+5+temp),  UI_POS_Y(610-10+temp_y), UI_POS_X(990+5+temp), UI_POS_Y(610-10+temp_y));  //中间
 	
-	Line_Draw(&Shoot_vertical_line1, "ve1", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(940+5), UI_POS_Y(630-10), UI_POS_X(940+5), UI_POS_Y(675-10));    //左上竖直线
-	Line_Draw(&Shoot_vertical_line2, "ve2", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(970+5), UI_POS_Y(630-10), UI_POS_X(970+5), UI_POS_Y(675-10));    //右上 
-	Line_Draw(&Shoot_vertical_line3, "ve3", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(940+5), UI_POS_Y(590-10), UI_POS_X(940+5), UI_POS_Y(535-10));    //左下
-	Line_Draw(&Shoot_vertical_line4, "ve4", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(970+5), UI_POS_Y(590-10), UI_POS_X(970+5), UI_POS_Y(535-10));    //右下
-	Line_Draw(&Shoot_vertical_line5, "ve5", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(955+5), UI_POS_Y(675-10), UI_POS_X(955+5), UI_POS_Y(535-10));    //中间
+	Line_Draw(&Shoot_vertical_line1, "ve1", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(940+5+temp), UI_POS_Y(630-10+temp_y), UI_POS_X(940+5+temp), UI_POS_Y(675-10+temp_y));    //左上竖直线
+	Line_Draw(&Shoot_vertical_line2, "ve2", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(970+5+temp), UI_POS_Y(630-10+temp_y), UI_POS_X(970+5+temp), UI_POS_Y(675-10+temp_y));    //右上 
+	Line_Draw(&Shoot_vertical_line3, "ve3", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(940+5+temp), UI_POS_Y(590-10+temp_y), UI_POS_X(940+5+temp), UI_POS_Y(535-10+temp_y));    //左下
+	Line_Draw(&Shoot_vertical_line4, "ve4", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(970+5+temp), UI_POS_Y(590-10+temp_y), UI_POS_X(970+5+temp), UI_POS_Y(535-10+temp_y));    //右下
+	Line_Draw(&Shoot_vertical_line5, "ve5", UI_Graph_ADD,4, UI_Color_Yellow, 2, UI_POS_X(955+5+temp), UI_POS_Y(675-10+temp_y), UI_POS_X(955+5+temp), UI_POS_Y(535-10+temp_y));    //中间
+
 
 	//自瞄框
 	Line_Draw(&vision_horizontal_line1, "hl1", UI_Graph_ADD, 0, UI_Color_Cyan, 3, 716, 735, 746, 735);
@@ -302,11 +304,11 @@ void UI_task_entry(void const *pvParameters)
 		UI_ReFresh(1, vision_horizontal_line4);  
 		vTaskDelay(100);
 		
-		//系统复位
-		if((rc_ctrl.key.v & KEY_PRESSED_OFFSET_R)&&(rc_ctrl.key.v & KEY_PRESSED_OFFSET_CTRL))
-		{
-			NVIC_SystemReset();
-		}
+//		//系统复位
+//		if((rc_ctrl.key.v & KEY_PRESSED_OFFSET_R)&&(rc_ctrl.key.v & KEY_PRESSED_OFFSET_CTRL))
+//		{
+//			NVIC_SystemReset();
+//		}
 	}	
 }
 

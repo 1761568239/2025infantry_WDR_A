@@ -7,7 +7,7 @@
 #define MAX_ITER 	100           //100
 
 //用于计算pitch轴角度
-#define DEFAULT_VEL 23
+#define DEFAULT_VEL 25
 
 #ifndef PI
 #define PI 3.141592653

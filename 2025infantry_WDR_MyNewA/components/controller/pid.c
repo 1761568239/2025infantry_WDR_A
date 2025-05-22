@@ -184,13 +184,13 @@ fp32 improve_PID_calc(pid_type_def *pid, fp32 ref, fp32 set, fp32 I_scope, fp32 
 		pid->Dbuf[0] = (pid->error[0] - pid->error[1]);
 		pid->Dout = pid->Kd * pid->Dbuf[0];
 		LimitMax(pid->Iout, pid->max_iout);
-//				if(fabs(pid->error[0]) >= deadline) //ËÀÇøÅĞ¶Ï
-//				{
+				if(fabs(pid->error[0]) >= deadline) //ËÀÇøÅĞ¶Ï
+				{
 		pid->out = pid->Pout + Ki*pid->Iout + Kd*pid->Dout;
 		LimitMax(pid->out, pid->max_out);
-//				}
-//				else
-//					pid->out = 0.0f;	
+				}
+				else
+					pid->out = 0.0f;	
 	}
 	return pid->out;
 }

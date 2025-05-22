@@ -79,10 +79,12 @@
 //电机rmp 变化成 旋转速度的比例
 #define MOTOR_RPM_TO_SPEED          0.00290888208665721596153948461415f 
 //拨弹速度
-#define TRIGGER_SPEED                 -5.0f     //-5
-#define CONTINUE_TRIGGER_SPEED        -7.0f		//10.0
-#define AUTO_TRIGGER_SPEED            -20.0f	  //20.0
-#define AUTO_TRIGGER_SPEED_HIGH_V_YAW -30.0f
+#define TRIGGER_SPEED                 -5.0f     //-5.0f           鼠标短按
+#define CONTINUE_TRIGGER_SPEED        -7.0f			//-7.0f						鼠标长按
+#define AUTO_TRIGGER_SPEED_LOW_V_YAW_1  -7.0f	   //-7.0f				自瞄 目标低速转动 低热量上限
+#define AUTO_TRIGGER_SPEED_HIGH_V_YAW_1 -15.0f    //-15.0f				自瞄 目标高速转动 低热量上限
+#define AUTO_TRIGGER_SPEED_LOW_V_YAW_2 -15.0f     //-15.0f				自瞄 目标低速转动 高热量上限
+#define AUTO_TRIGGER_SPEED_HIGH_V_YAW_2 -20.0f    //-20.0f				自瞄 目标高速转动 高热量上限
 //卡单时间 以及反转时间
 #define BLOCK_TRIGGER_SPEED         2.0f
 #define BLOCK_TIME                  1000   //1000
@@ -92,8 +94,15 @@
 #define PI_FIVE 					0.628318530717958647692528676655f
 #define PI_TEN                      0.314f
 //热量限制保留，防止操作手超热量
-#define SHOOT_HEAT_REMAIN_VALUE_MAX     30  //50
-#define SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX 80
+#define SHOOT_HEAT_REMAIN_VALUE_LOW_SPEED     30  //50
+#define SHOOT_HEAT_REMAIN_VALUE_HIGH_SPEED 80
+
+// 定义射速和热量余量的映射关系
+#define TRIGGER_SPEED_MIN    7.0f   // 最低射速
+#define TRIGGER_SPEED_MAX    20.0f  // 最高射速
+#define HEAT_REMAIN_MIN      30.0f  // 最低射速对应的热量余量
+#define HEAT_REMAIN_MAX      80.0f  // 最高射速对应的热量余量
+
 //3508转换为速度
 #define M3508_MOTOR_RPM_TO_VECTOR 0.000415809748903494517209f 
 /**********************************  其他宏定义常量 *************************************/

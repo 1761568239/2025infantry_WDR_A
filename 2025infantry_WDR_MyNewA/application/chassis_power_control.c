@@ -58,23 +58,22 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 	
 	if(chassis_power < 0.9f*max_power_limit)
 	{
-		input_power = -0.5f*(max_power_limit - chassis_power) + 0.9*max_power_limit; //修bug
+		input_power = -0.2f*(max_power_limit - chassis_power) + 0.9*max_power_limit; //修bug
 	}
-//	else if(chassis_power <= max_power_limit) 
-//	{
-//		input_power = -0.5f*(max_power_limit - chassis_power) + 0.9f*max_power_limit; //修bug
-//	}
 	else
 	{
 		input_power = 0.1f*(max_power_limit - chassis_power) + max_power_limit;
 	}
 	// 设置电容控制器的输入功率
+	
 	if(chassis_power_control->chassis_RC->key.v & KEY_PRESSED_OFFSET_F)
-	{chassis_max_power = 200;
-	 input_power = 0.8*max_power_limit;
-	 chassis_power_control->cap_flag = 1;
+	{
+		chassis_max_power = 200;
+		input_power = 0.8*max_power_limit;
+		chassis_power_control->cap_flag = 1;
 	}
-	else{
+	else
+	{
 		//设置不同的需求功率，控制超电选择超电或者放电
 		chassis_power_control->cap_flag = 0;
 
@@ -83,7 +82,7 @@ void chassis_power_control(chassis_move_t *chassis_power_control)
 			chassis_max_power = input_power +  50; // 略大于最大功率，避免电容器一直充满，提高能量利用率 50
 		}
 		else if (CAP_CANData.cap_energy <= 60 && CAP_CANData.cap_energy > 40)
-		{
+		{	
 			chassis_max_power = input_power + 30;    //当电容电量不足60%，但是大于40%时，限制底盘使用能量
 		}
 		else if (CAP_CANData.cap_energy <= 40 && CAP_CANData.cap_energy > 30)						//当电容电量不足40%，但是大于30%时，限制底盘使用能量

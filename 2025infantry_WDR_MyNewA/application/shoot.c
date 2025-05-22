@@ -132,37 +132,39 @@ int16_t shoot_control_loop(void)
 		shoot_control.shoot_speed_set = 0.0f;
     }
     else if(shoot_control.shoot_mode == OPEN_FRIC)
-    {				
+    {
 		shoot_control.trigger_speed_set = 0.0f;
     }
 	else if (shoot_control.shoot_mode == OPEN_TRIGGER)   //设置射频
     {
+			shoot_control.trigger_speed_set = -(0.037f * (shoot_control.heat_limit - shoot_control.heat) + 5.142f); //根据剩余热量进行基本弹频计算
+			
 			if(gimbal_behaviour == GIMBAL_AUTO)
 			{
-				if(shoot_control.heat_limit < 90.0f)  //总热量小于90时射频给低
+				if(shoot_control.heat_limit < 90.0f)  //总热量限制小于90时射频给低
 				{
-					shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED;
-					if(fabsf(st.v_yaw) > 4.0f)
-						shoot_control.trigger_speed_set = 15.0f;    //15 识别对象高转速时 自瞄射频高一点
+					if(fabsf(st.v_yaw) < 5.0f)
+						shoot_control.trigger_speed_set = (shoot_control.trigger_speed_set > AUTO_TRIGGER_SPEED_LOW_V_YAW_1) ? AUTO_TRIGGER_SPEED_LOW_V_YAW_1 : shoot_control.trigger_speed_set;
+					else// 识别对象高转速时 自瞄射频高一点
+						shoot_control.trigger_speed_set = (shoot_control.trigger_speed_set > AUTO_TRIGGER_SPEED_HIGH_V_YAW_1) ? AUTO_TRIGGER_SPEED_HIGH_V_YAW_1 : shoot_control.trigger_speed_set;
 				}
 				else
 				{
-					shoot_control.trigger_speed_set = AUTO_TRIGGER_SPEED;    //20 自瞄射频高一点
-					if(fabsf(st.v_yaw) > 4.0f)
-						shoot_control.trigger_speed_set = AUTO_TRIGGER_SPEED_HIGH_V_YAW;    //30 识别对象高转速时 自瞄射频高一点
+					if(fabsf(st.v_yaw) < 5.0f)
+						shoot_control.trigger_speed_set = (shoot_control.trigger_speed_set > AUTO_TRIGGER_SPEED_LOW_V_YAW_2) ? AUTO_TRIGGER_SPEED_LOW_V_YAW_2 : shoot_control.trigger_speed_set;
+					else// 识别对象高转速时 自瞄射频高一点
+						shoot_control.trigger_speed_set = (shoot_control.trigger_speed_set > AUTO_TRIGGER_SPEED_HIGH_V_YAW_2) ? AUTO_TRIGGER_SPEED_HIGH_V_YAW_2 : shoot_control.trigger_speed_set;					
 				}
 			}
 			else
 			{
 				if(shoot_control.mouse_state == MOUSE_SHORT_PRESS || shoot_control.trigger_down_state ==TRIGGER_DOWN_SHORT)
-				{
 					shoot_control.trigger_speed_set = TRIGGER_SPEED;   //5 鼠标短按或者遥杆短时间打下 
-				}	
 				else if(shoot_control.mouse_state == MOUSE_LONG_PRESS || shoot_control.trigger_down_state ==TRIGGER_DOWN_LONG)
-				{
-					shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED; //10 鼠标长按或者遥杆长时间打下
-				}
+					//shoot_control.trigger_speed_set = CONTINUE_TRIGGER_SPEED; //10 鼠标长按或者遥杆长时间打下
+					shoot_control.trigger_speed_set = -(0.037f * (shoot_control.heat_limit - shoot_control.heat) + 5.142f);//  对应冷却优先1级7，10级25
 			}
+			shoot_control.trigger_speed_set = (shoot_control.trigger_speed_set < -23.0f) ? -23.0f : shoot_control.trigger_speed_set;//上限约束
 			trigger_motor_turn_back();
     }
 	//由旋转切换至停止状态
@@ -240,12 +242,33 @@ static void shoot_set_mode(void)
 	{
 #if REFEREE
 	//如果当前裁判系统没问题，且热量余量高于限制值      
-	if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_AUTO_MAX <= shoot_control.heat_limit) && gimbal_behaviour == GIMBAL_AUTO)
-		shoot_flag = 1;
-	else if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_MAX <= shoot_control.heat_limit))
-		shoot_flag = 1;
-	else
-		shoot_flag = 0;
+//	if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_LOW_SPEED <= shoot_control.heat_limit) && shoot_control.trigger_speed_set > CONTINUE_TRIGGER_SPEED)
+//		shoot_flag = 1;    //射频较低时，热量限制较小
+//	else if(!toe_is_error(REFEREE_TOE) && (shoot_control.heat + SHOOT_HEAT_REMAIN_VALUE_HIGH_SPEED <= shoot_control.heat_limit) && shoot_control.trigger_speed_set > CONTINUE_TRIGGER_SPEED)
+//		shoot_flag = 1;    //射频较高时，热量限制较大
+//	else
+//		shoot_flag = 0;
+		
+//如果当前裁判系统没问题，且热量余量高于限制值  
+if (!toe_is_error(REFEREE_TOE)) 
+{
+//    float dynamic_heat_remain = 30.0f + (shoot_control.trigger_speed_set - 7.0f) * (50.0f ) / (13.0f);/*80-30*/   /*20-7*/
+	// 根据弹频计算动态热量余量
+		float dynamic_heat_remain = HEAT_REMAIN_MIN + 
+                            (shoot_control.trigger_speed_set - TRIGGER_SPEED_MIN) * 
+                            (HEAT_REMAIN_MAX - HEAT_REMAIN_MIN) / 
+                            (TRIGGER_SPEED_MAX - TRIGGER_SPEED_MIN);
+    dynamic_heat_remain = fmaxf(30.0f, fminf(dynamic_heat_remain, 80.0f));
+
+    if (shoot_control.heat + dynamic_heat_remain <= shoot_control.heat_limit)
+        shoot_flag = 1;
+    else
+        shoot_flag = 0;
+}
+else
+    shoot_flag = 0;
+
+		
 	//如果当前裁判系统没问题，且热量余量高于限制值
 //	if(shoot_control.heat_limit < 90.0f)  //针对1、2级冷却优先模式热量上限 <= 85时，预留49热量防超热量  此时自瞄弹频为10
 //	{
@@ -265,11 +288,11 @@ static void shoot_set_mode(void)
 #else
 	shoot_flag = 1;
 #endif
-      //如果左拨杆在下面或鼠标左键点击
-		if((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL])||shoot_control.press_l) && shoot_flag == 1)
+      //如果左拨杆在下面或鼠标左键点击 或右键开启自瞄
+		if((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL])||shoot_control.press_l || shoot_control.press_r) && shoot_flag == 1)// 
 		{
 			if((gimbal_behaviour == GIMBAL_AUTO) && get_auto_fire_state() == 2)   //火控
-			{	
+			{
 				shoot_control.shoot_mode = OPEN_TRIGGER;
 			}
 			else if(gimbal_behaviour!=GIMBAL_AUTO)
@@ -278,8 +301,8 @@ static void shoot_set_mode(void)
 			}else //自瞄模式点击右键但未锁定目标
 			{
 				shoot_control.shoot_mode = OPEN_FRIC;
-			}	
-		}				
+			}
+		}
 		else
 			shoot_control.shoot_mode = OPEN_FRIC;
     }
@@ -320,8 +343,8 @@ static void shoot_feedback_update(void)
     //拨弹轮电机速度滤波一下
     static const fp32 fliter_num[3] = {1.725709860247969f, -0.75594777109163436f, 0.030237910843665373f};
 	//定义长度为20的弹速历史数组及管理变量
-	static fp32 bullet_speed_history[20] = {24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 
-                                           24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f, 24.0f};
+	static fp32 bullet_speed_history[20] = {23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 
+                                           23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f, 23.0f};
     static uint8_t history_index = 0;    //弹速计算历史索引
     static fp32 last_bullet_speed = 0.0f; //上次弹速
     fp32 current_bullet_speed = 0.0f;     //当前弹速
@@ -387,7 +410,7 @@ static void shoot_feedback_update(void)
         history_index = (history_index + 1) % 20;        
         // 更新上一次速度记录
         last_bullet_speed = current_bullet_speed;
-    }   
+    }
     // 计算数组平均值
     for(uint8_t i = 0; i < 20; i++)
     {
@@ -395,15 +418,15 @@ static void shoot_feedback_update(void)
     }
     average_speed /= 20.0f;   
     // 设置弹速：2*22-数组的均值
-    shoot_control.shoot_speed_set = 2 * 21.5f - average_speed;    
+    shoot_control.shoot_speed_set = 19.0f;//2 * 21.2f - average_speed;    
     // 设置弹速上下限，防止极端情况
-    if(shoot_control.shoot_speed_set > 24.0f)
+    if(shoot_control.shoot_speed_set > 23.0f)
     {
-        shoot_control.shoot_speed_set = 24.0f;
+        shoot_control.shoot_speed_set = 23.0f;
     }
-    else if(shoot_control.shoot_speed_set < 20.0f)
+    else if(shoot_control.shoot_speed_set < 19.0f)
     {
-        shoot_control.shoot_speed_set = 20.0f;
+        shoot_control.shoot_speed_set = 19.0f;  //此时实际弹速为23......
     }
 	trigger_last_s = shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL];
 }

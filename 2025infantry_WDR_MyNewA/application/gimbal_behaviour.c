@@ -421,21 +421,21 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
 	{
         gimbal_behaviour = GIMBAL_AUTO;
     }
-	//判断遥控器滚轮，通道4的状态，以实现自瞄和小陀螺切换
-//	gimbal_mode_set->gyro_change_channel = gimbal_mode_set->gimbal_rc_ctrl->rc.ch[GIMBAL_AUTO_CHANGE_CHANNEL];
-//	if(gimbal_mode_set->gyro_change_channel >= -CHASSIS_RC_DEADLINE && gimbal_mode_set->gyro_change_channel <= CHASSIS_RC_DEADLINE)
-//	{
-//		gimbal_mode_set->gyro_change_channel = 0;           //死区限制，防止值抖动，导致切换异常
-//	}	
-//	if(gimbal_mode_set->gyro_change_channel  != 0  && \
-//	   gimbal_mode_set->last_gyro_change_channel == 0)       //如果该值有一个不等于0并且超过死去的阶跃则切换
-//	{
-//		gimbal_mode_set->auto_gyro_mode = !gimbal_mode_set->auto_gyro_mode;  //状态切换
-//	}
+		//判断遥控器滚轮，通道4的状态，以实现自瞄和小陀螺切换
+		gimbal_mode_set->gyro_change_channel = gimbal_mode_set->gimbal_rc_ctrl->rc.ch[GIMBAL_AUTO_CHANGE_CHANNEL];
+		if(gimbal_mode_set->gyro_change_channel >= -CHASSIS_RC_DEADLINE && gimbal_mode_set->gyro_change_channel <= CHASSIS_RC_DEADLINE)
+		{
+			gimbal_mode_set->gyro_change_channel = 0;           //死区限制，防止值抖动，导致切换异常
+		}
+		if(gimbal_mode_set->gyro_change_channel  != 0  && \
+			 gimbal_mode_set->last_gyro_change_channel == 0)       //如果该值有一个不等于0并且超过死去的阶跃则切换
+		{
+			gimbal_mode_set->auto_gyro_mode = !gimbal_mode_set->auto_gyro_mode;  //状态切换
+		}
 
 	//判断遥控器在线否
     if( toe_is_error(DBUS_TOE))
-    {
+    { 
         gimbal_behaviour = GIMBAL_ZERO_FORCE;
     }
     //判断进入init状态机
@@ -510,8 +510,12 @@ static void gimbal_init_control(fp32 *yaw, fp32 *pitch, gimbal_control_t *gimbal
     }
     else
     {
+				 *yaw = (INIT_YAW_SET - gimbal_control_set->gimbal_yaw_motor.relative_angle) * GIMBAL_INIT_YAW_SPEED;
+			if(fabs(gimbal_control_set->gimbal_yaw_motor.relative_angle) > 1.2f)
+			{
+				*yaw = (*yaw > 0) ? 0.002f : -0.002f;
+			}
         *pitch = (INIT_PITCH_SET - gimbal_control_set->gimbal_pitch_motor.absolute_angle) * GIMBAL_INIT_PITCH_SPEED;
-        *yaw = (INIT_YAW_SET - gimbal_control_set->gimbal_yaw_motor.relative_angle) * GIMBAL_INIT_YAW_SPEED;
     }
 }
 

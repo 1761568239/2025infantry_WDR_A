@@ -36,7 +36,7 @@ float last_filtered_v_yaw = 2.5f;
 void st_Data_Iint(void)
 {
 	//定义参数
-	st.k = 0.092f;                   //弹道系数
+	st.k = 0.092f;            //弹道系数
 	st.bullet_type =  BULLET_17;     //弹丸类型
 	st.current_v = 18.0;               //弹丸出射速度    17.5   26
 	st.current_pitch = 0;            
@@ -83,10 +83,10 @@ float calculate_dynamic_smoothing_factor(float v_yaw, uint8_t armor_id) //根据
 		
 		if(factor <= 0.2f)    // 确保平滑系数不会低于最小值，防止负值或过小值
 			return 0.2f;
-		else if (factor > 0.2f && factor <= 2.0f)
+		else if (factor > 0.2f && factor <= 1.5f)
 			return factor;
 		else
-			return 2.0f;
+			return 1.5f;
 }
 
 /*
@@ -130,10 +130,6 @@ void autoSolveTrajectory(float *pitch, float *yaw, float *aim_x, float *aim_y, f
     pre_yc = yc + st.vyw * fly_time;
     pre_yaw = armor_yaw + st.v_yaw * fly_time;
 
-//		float filtered_v_yaw = alpha * v_yaw + (1.0f - alpha) * last_filtered_v_yaw; // 低通滤波
-//		last_filtered_v_yaw	 = 	filtered_v_yaw;
-//		watch_debug_1 = v_yaw;
-//		watch_debug_2 = filtered_v_yaw;
 		smoothing_factor = calculate_dynamic_smoothing_factor(v_yaw, st.armor_id);//预测权重，可以根据实际情况调整 越大越相信预测结果
 
     control_status = 0;
@@ -151,14 +147,13 @@ void autoSolveTrajectory(float *pitch, float *yaw, float *aim_x, float *aim_y, f
         bool_t is_current_pair = 1;
         float r = 0;
         float center_yaw = atan2(pre_yc, pre_xc);
-			  float best_distance = 9999.0f;
         int best_armor_index = -1;
 			
         for (size_t i = 0; i < a_n; i++) {
             float tmp_yaw = pre_yaw + i * (2 * PI / a_n);
             float yaw_diff = loop_fp32_constrain(center_yaw - tmp_yaw, -PI, PI);
             float yaw_diff_offset = signbit(v_yaw) ? -ARMOR_YAW_LIMIT_OFFSET : ARMOR_YAW_LIMIT_OFFSET;
-            
+
             if (-ARMOR_YAW_LIMIT + yaw_diff_offset < yaw_diff &&
                 yaw_diff < ARMOR_YAW_LIMIT + yaw_diff_offset) {
 
@@ -169,22 +164,18 @@ void autoSolveTrajectory(float *pitch, float *yaw, float *aim_x, float *aim_y, f
                 r = r1;
                 *aim_z = z;
               }
-							// 新的装甲板选择策略：综合考虑角度和距离
+
 							float armor_x = pre_xc - r * cosf(tmp_yaw);
-              float armor_y = pre_yc - r * sinf(tmp_yaw);
-              float current_distance = sqrt(armor_x*armor_x + armor_y*armor_y);
-                
-                // 优先选择角度和距离都最优的装甲板   下面系数可以改变权重
-							float score = fabsf(yaw_diff) + 0.1f * current_distance;
-              if (score < best_distance) {
-                    best_distance = score;
+              float armor_y = pre_yc - r * sinf(tmp_yaw);            
+
+              if (armor_x*armor_x +armor_y*armor_y < pre_xc*pre_xc + pre_yc*pre_yc) {
                     best_armor_index = i;
-                    
+
                     *aim_x = pre_xc * (1 - smoothing_factor) + (pre_xc - r * cosf(tmp_yaw)) * smoothing_factor;
                     *aim_y = pre_yc * (1 - smoothing_factor) + (pre_yc - r * sinf(tmp_yaw)) * smoothing_factor;
                     control_status = 1;
+										break;
               }
-              
             }
             is_current_pair = !is_current_pair;
         }
@@ -195,11 +186,25 @@ void autoSolveTrajectory(float *pitch, float *yaw, float *aim_x, float *aim_y, f
         solver(DEFAULT_VEL, st.k, sqrt((*aim_x) * (*aim_x) + (*aim_y) * (*aim_y)) - st.s_bias, *aim_z, &temp_pitch);
         if(temp_pitch)
             *pitch = -temp_pitch;
-        
+
         if(*aim_x || *aim_y)
-                    {
-                        *yaw = (float)(atan2(*aim_y, *aim_x));
-                    }
+				{
+						if(fabs(v_yaw) < 5.5f)
+						  *yaw = (float)(atan2(*aim_y, *aim_x));
+						else
+						  *yaw = (float)(atan2(st.yw ,st.xw)); 
+				}
+
+//        if(*aim_x || *aim_y)
+//				{
+//					if(fabs(v_yaw) < 5.5f)
+//						  *yaw = (float)(atan2(*aim_y, *aim_x));
+//					else if(fabs(v_yaw) >= 5.5f && sqrt((*aim_x) * (*aim_x) + (*aim_y) * (*aim_y)) < 6.0f)
+//						  *yaw = (float)(atan2(st.yw ,st.xw)); 
+//					else
+//							*yaw = (float)(atan2(*aim_y, *aim_x));
+//				}
+				
         if( control_status == 1 && received_packed.tracking == 1)
         {
             // Fire control

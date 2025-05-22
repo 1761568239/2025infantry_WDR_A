@@ -44,19 +44,19 @@
 	
 /**********************************  底盘相关PID参数 *************************************/
 //底盘电机速度环PID
-#define M3505_MOTOR_SPEED_PID_KP 20000.0f   //18500.0f    20000
-#define M3505_MOTOR_SPEED_PID_KI 20.0f      //20.0f       30
+#define M3505_MOTOR_SPEED_PID_KP 20000.0f   //20000
+#define M3505_MOTOR_SPEED_PID_KI 15.0f      //20.0f       30
 #define M3505_MOTOR_SPEED_PID_KD 0.0f	
 #define M3505_MOTOR_SPEED_PID_MAX_OUT    MAX_MOTOR_CAN_CURRENT   //16000
-#define M3505_MOTOR_SPEED_PID_MAX_IOUT 	2500.0f                  //2000.0f
+#define M3505_MOTOR_SPEED_PID_MAX_IOUT 	2000.0f                  //2000.0f
 
 //底盘电机速度环PID
 //第四个电机响应慢故单给一个PID进行控制
-#define M3505_MOTOR3_SPEED_PID_KP 20000.0f   //18500.0f    20000
-#define M3505_MOTOR3_SPEED_PID_KI 20.0f      //20.0f       30
+#define M3505_MOTOR3_SPEED_PID_KP 25000.0f   //20000
+#define M3505_MOTOR3_SPEED_PID_KI 15.0f      //20.0f       30
 #define M3505_MOTOR3_SPEED_PID_KD 0.0f	
 #define M3505_MOTOR3_SPEED_PID_MAX_OUT    MAX_MOTOR_CAN_CURRENT   //16000
-#define M3505_MOTOR3_SPEED_PID_MAX_IOUT 	2500.0f                  //2000.0f
+#define M3505_MOTOR3_SPEED_PID_MAX_IOUT 	2000.0f                  //2000.0f
 	
 //底盘旋转跟随PID
 #define CHASSIS_FOLLOW_GIMBAL_PID_KP 16.0f      //7.5     15
@@ -64,7 +64,7 @@
 #define CHASSIS_FOLLOW_GIMBAL_PID_KD 0.10f  	//0.0
 #define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT    12.0f   //10
 #define CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT   0.5f    //0.5
-#define CHASSIS_FOLLOW_deadline      0.05f  			 //底盘跟随死区//0.1
+#define CHASSIS_FOLLOW_deadline      0.02f  			 //底盘跟随死区//0.1
 //回中时缓慢回中，防止过冲
 #define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KP 4.0f      //7.5 
 #define CHASSIS_FOLLOW_GIMBAL_SLOW_PID_KI 0.01f     //0
@@ -128,7 +128,7 @@
 //底盘运动过程最大平移速度
 #define CHASSIS_MAX_SPEED_Y     2.5f  //2.0  
 //小陀螺转速
-#define CHASSIS_MAX_SPEED_WZ	4.3f  //1.8  2.5   3.0
+#define CHASSIS_MAX_SPEED_WZ	4.3f  //1.8  2.5   3.0       4.3
 /**********************************  其他宏定义常量 *************************************/
 
 /**********************************  枚举和结构体定义 *************************************/

@@ -105,6 +105,10 @@ static void chassic_raw_control(fp32 vx_set, fp32 vy_set, fp32 angle_set, chassi
 chassis_move_t chassis_move;
 //========================================== 全局变量定义区域 ==============================================
 
+//========================================== 全局变量区域 ==============================================
+extern RC_ctrl_t rc_ctrl;
+//========================================== 全局变量区域 ==============================================
+
 /**
   * @brief          底盘任务，间隔 CHASSIS_CONTROL_TIME_MS 2ms
   * @param[in]      pvParameters: 空
@@ -123,6 +127,14 @@ void chassis_task(void const *pvParameters)
     }
     while (1)
     {
+			
+				//系统复位   UI任务中延时太多，响应太慢
+				if((rc_ctrl.key.v & KEY_PRESSED_OFFSET_R)&&(rc_ctrl.key.v & KEY_PRESSED_OFFSET_CTRL))
+				{
+					NVIC_SystemReset();
+					vTaskDelay(200);  //防止多次重复触发
+				}
+			
         //设置底盘控制模式
         chassis_set_mode(&chassis_move);
         //模式切换数据保存
@@ -149,6 +161,7 @@ void chassis_task(void const *pvParameters)
 				#else
 				CAN_cmd_chassis((chassis_move.motor_chassis[0].give_current), (chassis_move.motor_chassis[1].give_current),
                                 (chassis_move.motor_chassis[2].give_current), (chassis_move.motor_chassis[3].give_current));
+	//			CAN_cmd_chassis(500, 500, 500, 500);
 				#endif 
             }
         }
@@ -215,8 +228,8 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
     //最大 最小速度
     chassis_move_init->vx_max_speed =  CHASSIS_MAX_SPEED_X;
-    chassis_move_init->vx_min_speed = -CHASSIS_MAX_SPEED_Y;
-    chassis_move_init->vy_max_speed =  CHASSIS_MAX_SPEED_X;
+    chassis_move_init->vx_min_speed = -CHASSIS_MAX_SPEED_X;
+    chassis_move_init->vy_max_speed =  CHASSIS_MAX_SPEED_Y;
     chassis_move_init->vy_min_speed = -CHASSIS_MAX_SPEED_Y;
 	chassis_move_init->gyroscope_flag = 0;	
     //更新一下数据
@@ -565,7 +578,7 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
     chassis_vector_to_omni_wheel_speed(chassis_move_control_loop->vx_set,chassis_move_control_loop->vy_set, chassis_move_control_loop->wz_set, wheel_speed,CHASSIC_MACANUM_WHEEL);
 
     if (chassis_move_control_loop->chassis_mode == CHASSIS_VECTOR_RAW && !chassis_move_control_loop->auto_flag)
-    {    
+    {
         for (i = 0; i < 4; i++)
         {
             chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(wheel_speed[i]);
@@ -599,8 +612,10 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
         PID_calc(&chassis_move_control_loop->motor_speed_pid[i], chassis_move_control_loop->motor_chassis[i].speed, chassis_move_control_loop->motor_chassis[i].speed_set);
     }
 //    //功率控制---通过功率控制限制功率
+		chassis_move_control_loop->motor_speed_pid[1].out *= 1.1f;//测试性矫正
+		chassis_move_control_loop->motor_speed_pid[1].out *= 1.1f;//测试性矫正
 	//上坡功率重分配
-	if(chassis_move_control_loop->chassis_pitch < -0.1f)
+	if(chassis_move_control_loop->chassis_pitch < -0.18f)
 	{
 		chassis_move_control_loop->motor_speed_pid[2].out *= 2.0f;
 		chassis_move_control_loop->motor_speed_pid[3].out *= 2.0f;
